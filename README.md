@@ -1,5 +1,7 @@
 # Federal Reserve Economic Data MCP Server
 
+[![smithery badge](https://smithery.ai/badge/@stefanoamorelli/fred-mcp-server)](https://smithery.ai/server/@stefanoamorelli/fred-mcp-server)
+
 > [!IMPORTANT]
 > *Disclaimer*: This open-source project is not affiliated with, sponsored by, or endorsed by the *Federal Reserve* or the *Federal Reserve Bank of St. Louis*. "FRED" is a registered trademark of the *Federal Reserve Bank of St. Louis*, used here for descriptive purposes only.
 
@@ -26,6 +28,16 @@ A Model Context Protocol (`MCP`) server for accessing Federal Reserve Economic D
 
 
 ## Installation
+
+### Installing via Smithery
+
+To install Federal Reserve Economic Data Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@stefanoamorelli/fred-mcp-server):
+
+```bash
+npx -y @smithery/cli install @stefanoamorelli/fred-mcp-server --client claude
+```
+
+### Manual Installation
 
 1.  Clone the repository:
     ```bash
