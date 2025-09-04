@@ -66,6 +66,31 @@ Install the server, for example, on [Claude Desktop](https://claude.ai/download)
 }
 ```
 
+### Using Docker
+
+You can also run the FRED MCP Server using Docker. Add this configuration to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "fred-mcp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "FRED_API_KEY=<your-key-here>",
+        "stefanoamorelli/fred-mcp-server:latest"
+      ],
+      "env": {}
+    }
+  }
+}
+```
+
+Replace `<your-key-here>` with your actual FRED API key.
+
 ## Available Tools
 
 This MCP server provides three comprehensive tools to access all 800,000+ FRED® economic data series:
