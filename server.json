@@ -1,0 +1,31 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.stefanoamorelli/fred-mcp-server",
+  "description": "Federal Reserve Economic Data (FRED) MCP Server - Access all 800,000+ economic time series",
+  "status": "active",
+  "repository": {
+    "url": "https://github.com/stefanoamorelli/fred-mcp-server",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registry_type": "npm",
+      "registry_base_url": "https://registry.npmjs.org",
+      "identifier": "fred-mcp-server",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environment_variables": [
+        {
+          "description": "Your FRED API key to access the API",
+          "is_required": true,
+          "format": "string",
+          "is_secret": true,
+          "name": "FRED_API_KEY"
+        }
+      ]
+    }
+  ]
+}
