@@ -155,6 +155,35 @@ With these three tools, you can:
 - Retrieve any of the 800,000+ series with custom transformations
 - Access real-time economic data including GDP, unemployment, inflation, interest rates, and more
 
+## Social Media Shoutouts 📣
+
+> [!NOTE]
+> Want to be featured? Tag [Stefano Amorelli](https://www.linkedin.com/in/stefanoamorelli/) on LinkedIn or [@stefanoamorelli](https://x.com/stefanoamorelli) on X in your post about using FRED MCP Server, or [submit a PR](https://github.com/stefanoamorelli/fred-mcp-server/pulls) to add your shoutout!
+
+We're grateful for the community support! Here are some mentions from amazing people:
+
+<details open>
+<summary><b>Scott G</b> - "One of my breakthrough moments for 'getting' what is possible with Claude was this fred-mcp-server project..."</summary>
+<br>
+<a href="https://www.linkedin.com/posts/sgoley_as-many-of-us-continue-to-use-llms-more-and-activity-7372401049669885952-ha6M">
+  <img src="assets/social/linkedin-sgoley.png" alt="LinkedIn post by Scott G - Fintech & Data Analytics Professional" width="600">
+</a>
+<br>
+<i>Scott G - Fintech & Data Analytics Professional</i> | <a href="https://www.linkedin.com/in/sgoley/">LinkedIn Profile</a>
+</details>
+
+<details open>
+<summary><b>John Shelburne</b> - "The FRED MCP Server is a game-changer for financial analysis..."</summary>
+<br>
+<a href="https://www.linkedin.com/posts/shelburne_ai-finance-innovation-activity-7341141860880478210-JQe4">
+  <img src="assets/social/linkedin-john-shelburne.jpg" alt="LinkedIn post by John Shelburne" width="600">
+</a>
+<br>
+<i>John Shelburne - Fixed Income Fintech Leader with 20+ Years of Experience | Machine Learning & Cloud Computing Specialist</i> | <a href="https://www.linkedin.com/in/shelburne/">LinkedIn Profile</a>
+</details>
+
+<!-- Add more social media posts here using the format above -->
+
 ## Testing
 
 See [TESTING.md](./TESTING.md) for more details.
