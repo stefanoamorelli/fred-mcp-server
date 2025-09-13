@@ -7,7 +7,7 @@
     "url": "https://github.com/stefanoamorelli/fred-mcp-server",
     "source": "github"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "packages": [
     {
       "registry_type": "npm",
