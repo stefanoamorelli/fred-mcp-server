@@ -166,7 +166,7 @@ We're grateful for the community support! Here are some mentions from amazing pe
 <summary><b>Scott G</b> - "One of my breakthrough moments for 'getting' what is possible with Claude was this fred-mcp-server project..."</summary>
 <br>
 <a href="https://www.linkedin.com/posts/sgoley_as-many-of-us-continue-to-use-llms-more-and-activity-7372401049669885952-ha6M">
-  <img src="assets/social/linkedin-sgoley.png" alt="LinkedIn post by Scott G - Fintech & Data Analytics Professional" width="600">
+  <img src="assets/social/linkedin-sgoley.jpg" alt="LinkedIn post by Scott G - Fintech & Data Analytics Professional" width="600">
 </a>
 <br>
 <i>Scott G - Fintech & Data Analytics Professional</i> | <a href="https://www.linkedin.com/in/sgoley/">LinkedIn Profile</a>
