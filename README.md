@@ -2,6 +2,7 @@
 
 [![smithery badge](https://smithery.ai/badge/@stefanoamorelli/fred-mcp-server)](https://smithery.ai/server/@stefanoamorelli/fred-mcp-server)
 [![npm version](https://img.shields.io/npm/v/fred-mcp-server.svg)](https://www.npmjs.com/package/fred-mcp-server)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14536707.svg)](https://doi.org/10.5281/zenodo.14536707)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Tests](https://github.com/stefanoamorelli/fred-mcp-server/actions/workflows/test.yml/badge.svg)](https://github.com/stefanoamorelli/fred-mcp-server/actions/workflows/test.yml)
 
@@ -13,9 +14,27 @@ A Model Context Protocol (`MCP`) server providing universal access to all 800,00
 https://github.com/user-attachments/assets/66c7f3ad-7b0e-4930-b1c5-a675a7eb1e09
 
 > [!TIP]
-> If you use this project in your research or work, please cite it using the [CITATION.cff](CITATION.cff) file, or the APA format below:
+> If you use this project in your research or work, please cite it using the [CITATION.cff](CITATION.cff) file, or use the following citation:
 
-`Amorelli, S. (2025). Federal Reserve Economic Data MCP (Model Context Protocol) Server [Computer software]. GitHub. https://github.com/stefanoamorelli/fred-mcp-server`
+**APA Format:**
+```
+Amorelli, S. (2025). Federal Reserve Economic Data MCP (Model Context Protocol) Server (Version 1.0.2) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.14536707
+```
+
+**BibTeX:**
+```bibtex
+@software{amorelli_2025_14536707,
+  author       = {Amorelli, Stefano},
+  title        = {{Federal Reserve Economic Data MCP (Model Context
+                   Protocol) Server}},
+  month        = jan,
+  year         = 2025,
+  publisher    = {Zenodo},
+  version      = {1.0.2},
+  doi          = {10.5281/zenodo.14536707},
+  url          = {https://doi.org/10.5281/zenodo.14536707}
+}
+```
 
 
 ## Installation
