@@ -1,6 +1,6 @@
 {
   "name": "fred-mcp-server",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Federal Reserve Economic Data (FRED) MCP Server - Access all 800,000+ economic time series with search, browse, and data retrieval capabilities",
   "main": "build/index.js",
   "keywords": [
@@ -15,7 +15,7 @@
   "mcpName": "io.github.stefanoamorelli/fred-mcp-server",
   "type": "module",
   "bin": {
-    "fred": "./build/index.js"
+    "fred-mcp-server": "./build/index.js"
   },
   "scripts": {
     "build": "tsc && chmod 755 build/index.js",
