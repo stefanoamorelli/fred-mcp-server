@@ -1,0 +1,556 @@
+---
+title: Economic Analysis
+description: Using FRED for comprehensive economic analysis and research
+icon: 'chart-mixed'
+---
+
+# Economic Analysis Use Case
+
+Leverage FRED MCP Server for comprehensive economic analysis, from macroeconomic forecasting to sectoral performance evaluation.
+
+## Overview
+
+Economic analysts use FRED data to:
+- Monitor current economic conditions
+- Analyze historical trends
+- Identify relationships between indicators
+- Support forecasting and projections
+- Evaluate policy impacts
+
+## Macroeconomic Analysis
+
+### Business Cycle Analysis
+
+Track key indicators across the cycle:
+
+<Steps>
+  <Step title="Leading Indicators">
+    ```javascript
+    // Building permits
+    { "series_id": "PERMIT" }
+
+    // Initial jobless claims
+    { "series_id": "ICSA" }
+
+    // Yield curve spread
+    { "series_id": "T10Y2Y" }
+
+    // Consumer expectations
+    { "series_id": "UMCSENT" }
+    ```
+  </Step>
+
+  <Step title="Coincident Indicators">
+    ```javascript
+    // GDP
+    { "series_id": "GDP" }
+
+    // Employment
+    { "series_id": "PAYEMS" }
+
+    // Industrial production
+    { "series_id": "INDPRO" }
+
+    // Retail sales
+    { "series_id": "RSXFS" }
+    ```
+  </Step>
+
+  <Step title="Lagging Indicators">
+    ```javascript
+    // Unemployment
+    { "series_id": "UNRATE" }
+
+    // Unit labor costs
+    { "series_id": "ULCNFB" }
+
+    // Consumer credit
+    { "series_id": "TOTALSL" }
+    ```
+  </Step>
+</Steps>
+
+### GDP Decomposition
+
+Analyze sources of growth:
+
+```javascript
+// Total GDP
+const gdp = {
+  "series_id": "GDP",
+  "observation_start": "2020-Q1",
+  "units": "pca"
+};
+
+// Components
+const components = {
+  consumption: "PCEC",      // Personal consumption (68%)
+  investment: "GPDI",       // Gross private investment (17%)
+  government: "GCE",        // Government spending (17%)
+  net_exports: "NETEXP"     // Exports - Imports
+};
+```
+
+<Tip>
+  GDP = C + I + G + (X - M)
+
+  Track component contributions to identify growth drivers
+</Tip>
+
+## Inflation Analysis
+
+### Multiple Measures
+
+Compare different inflation indicators:
+
+<Tabs>
+  <Tab title="Consumer Prices">
+    ```javascript
+    // Headline CPI
+    {
+      "series_id": "CPIAUCSL",
+      "units": "pc1"
+    }
+
+    // Core CPI (ex food & energy)
+    {
+      "series_id": "CPILFESL",
+      "units": "pc1"
+    }
+
+    // Services CPI
+    {
+      "series_id": "CUSR0000SAS",
+      "units": "pc1"
+    }
+
+    // Goods CPI
+    {
+      "series_id": "CUUR0000SAC",
+      "units": "pc1"
+    }
+    ```
+  </Tab>
+
+  <Tab title="Producer Prices">
+    ```javascript
+    // Headline PPI
+    {
+      "series_id": "PPIACO",
+      "units": "pc1"
+    }
+
+    // Core PPI
+    {
+      "series_id": "PPILFE",
+      "units": "pc1"
+    }
+    ```
+  </Tab>
+
+  <Tab title="PCE Deflator">
+    ```javascript
+    // PCE Price Index (Fed's preferred)
+    {
+      "series_id": "PCEPI",
+      "units": "pc1"
+    }
+
+    // Core PCE
+    {
+      "series_id": "PCEPILFE",
+      "units": "pc1"
+    }
+    ```
+  </Tab>
+
+  <Tab title="Import/Export Prices">
+    ```javascript
+    // Import prices
+    {
+      "series_id": "IR",
+      "units": "pc1"
+    }
+
+    // Export prices
+    {
+      "series_id": "IQ",
+      "units": "pc1"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Inflation Expectations
+
+Monitor forward-looking indicators:
+
+```javascript
+// University of Michigan 1-year ahead
+{
+  "series_id": "MICH",
+  "observation_start": "2020-01-01"
+}
+
+// 5-year breakeven rate
+{
+  "series_id": "T5YIE",
+  "observation_start": "2020-01-01"
+}
+
+// 10-year breakeven rate
+{
+  "series_id": "T10YIE",
+  "observation_start": "2020-01-01"
+}
+```
+
+## Labor Market Analysis
+
+### Employment Dynamics
+
+```javascript
+// Comprehensive labor market dashboard
+const labor_dashboard = {
+  // Headline indicators
+  unemployment: "UNRATE",
+  payrolls: "PAYEMS",
+  participation: "CIVPART",
+
+  // Broader measures
+  u6_rate: "U6RATE",
+  employment_ratio: "EMRATIO",
+  part_time_economic: "LNS12032194",
+
+  // Flows
+  initial_claims: "ICSA",
+  continuing_claims: "CCSA",
+  job_openings: "JTSJOL",
+  quits: "JTSQUL",
+
+  // Wages
+  avg_hourly_earnings: "CES0500000003",
+  real_earnings: "CES0500000030",
+  unit_labor_costs: "ULCNFB"
+};
+```
+
+### Sectoral Employment
+
+Track employment by industry:
+
+<CardGroup cols={2}>
+  <Card title="Manufacturing" icon="industry">
+    ```javascript
+    { "series_id": "MANEMP" }
+    ```
+  </Card>
+  <Card title="Construction" icon="helmet-safety">
+    ```javascript
+    { "series_id": "USCONS" }
+    ```
+  </Card>
+  <Card title="Retail Trade" icon="cart-shopping">
+    ```javascript
+    { "series_id": "USTRADE" }
+    ```
+  </Card>
+  <Card title="Healthcare" icon="heart-pulse">
+    ```javascript
+    { "series_id": "CES6500000001" }
+    ```
+  </Card>
+  <Card title="Professional Services" icon="briefcase">
+    ```javascript
+    { "series_id": "USPBS" }
+    ```
+  </Card>
+  <Card title="Leisure & Hospitality" icon="utensils">
+    ```javascript
+    { "series_id": "CES7000000001" }
+    ```
+  </Card>
+</CardGroup>
+
+## Financial Conditions
+
+### Interest Rate Analysis
+
+```javascript
+// Yield curve
+const yield_curve = {
+  one_month: "DGS1MO",
+  three_month: "DGS3MO",
+  six_month: "DGS6MO",
+  one_year: "DGS1",
+  two_year: "DGS2",
+  five_year: "DGS5",
+  ten_year: "DGS10",
+  thirty_year: "DGS30"
+};
+
+// Spreads
+const spreads = {
+  ten_two: "T10Y2Y",
+  ten_three_month: "T10Y3M",
+  bbb_treasury: "BAMLC0A4CBBB"
+};
+```
+
+### Financial Stress Indicators
+
+```javascript
+// St. Louis Fed Financial Stress Index
+{
+  "series_id": "STLFSI2",
+  "observation_start": "2020-01-01"
+}
+
+// TED Spread
+{
+  "series_id": "TEDRATE",
+  "observation_start": "2020-01-01"
+}
+
+// VIX (market volatility)
+{
+  "series_id": "VIXCLS",
+  "observation_start": "2020-01-01"
+}
+```
+
+## Sectoral Analysis
+
+### Housing Market
+
+```javascript
+const housing_metrics = {
+  // Supply
+  starts: "HOUST",
+  permits: "PERMIT",
+  under_construction: "UNDCONTSA",
+
+  // Demand
+  existing_sales: "EXHOSLUSM495S",
+  new_sales: "HSN1F",
+
+  // Prices
+  case_shiller: "CSUSHPISA",
+  fhfa_index: "USSTHPI",
+  median_price: "MSPUS",
+
+  // Affordability
+  mortgage_rate: "MORTGAGE30US",
+  affordability_index: "FIXHAI"
+};
+```
+
+### Manufacturing Sector
+
+```javascript
+// Production
+{
+  "series_id": "IPMAN",
+  "observation_start": "2020-01-01",
+  "units": "pc1"
+}
+
+// Orders
+{
+  "series_id": "AMTMNO",
+  "observation_start": "2020-01-01"
+}
+
+// Capacity utilization
+{
+  "series_id": "MCU",
+  "observation_start": "2020-01-01"
+}
+
+// PMI
+{
+  "series_id": "MANEMP",
+  "observation_start": "2020-01-01"
+}
+```
+
+## Regional Analysis
+
+### State Comparisons
+
+```javascript
+// Compare unemployment across states
+const states = ["CA", "TX", "NY", "FL", "IL"];
+
+states.forEach(state => {
+  fred_get_series({
+    series_id: `${state}UR`,
+    observation_start: "2020-01-01"
+  });
+});
+
+// State GDP
+states.forEach(state => {
+  fred_get_series({
+    series_id: `${state}NGSP`,
+    observation_start: "2020-Q1"
+  });
+});
+```
+
+### Metro Area Analysis
+
+```javascript
+// Major metro unemployment rates
+const metros = {
+  nyc: "LAUMT364190",
+  la: "LAUMT064910",
+  chicago: "LAUMT121410",
+  dallas: "LAUMT481910",
+  houston: "LAUMT482610"
+};
+```
+
+## Recession Analysis
+
+### NBER Dating
+
+```javascript
+// Official recession indicator
+{
+  "series_id": "USREC",
+  "observation_start": "2000-01-01"
+}
+
+// Sahm Rule Recession Indicator
+{
+  "series_id": "SAHMREALTIME",
+  "observation_start": "2000-01-01"
+}
+```
+
+### Recession Depth and Duration
+
+<Steps>
+  <Step title="Identify Peak">
+    Find pre-recession highs in key indicators
+  </Step>
+
+  <Step title="Track Trough">
+    Identify lowest points during recession
+  </Step>
+
+  <Step title="Measure Recovery">
+    Calculate time to return to pre-recession levels
+  </Step>
+
+  <Step title="Compare Recessions">
+    Analyze differences in depth, duration, and recovery shape
+  </Step>
+</Steps>
+
+## International Comparisons
+
+### Global Indicators
+
+```javascript
+// OECD data
+const global = {
+  // Composite leading indicators
+  us_cli: "USALOLITONOSTSAM",
+  oecd_cli: "USALOLITONOSTSAM",
+
+  // GDP
+  g7_gdp: "NAEXKP01",
+  china_gdp: "CHNNGDP",
+  eu_gdp: "CLVMNACSCAB1GQEU272020",
+
+  // Trade
+  global_trade: "WLDXTIMVA"
+};
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Multiple Indicators">
+    Don't rely on single metrics. Cross-validate with complementary series.
+  </Accordion>
+
+  <Accordion title="Check Data Revisions">
+    Economic data undergoes revisions. Use vintage data for historical analysis.
+  </Accordion>
+
+  <Accordion title="Understand Seasonal Patterns">
+    Use SA data for trends, NSA for actual seasonal patterns.
+  </Accordion>
+
+  <Accordion title="Consider Lead Times">
+    Account for reporting lags and indicator relationships.
+  </Accordion>
+
+  <Accordion title="Document Methodology">
+    Record transformation choices and analysis assumptions.
+  </Accordion>
+</AccordionGroup>
+
+## Analysis Workflow
+
+<Steps>
+  <Step title="Define Question">
+    Clearly state what you're analyzing
+  </Step>
+
+  <Step title="Identify Indicators">
+    Select relevant series for your analysis
+  </Step>
+
+  <Step title="Gather Data">
+    Retrieve series with appropriate transformations
+  </Step>
+
+  <Step title="Analyze Trends">
+    Look for patterns, correlations, and anomalies
+  </Step>
+
+  <Step title="Validate Findings">
+    Cross-check with alternative indicators
+  </Step>
+
+  <Step title="Document Results">
+    Record methodology and conclusions
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Financial Research"
+    icon="chart-candlestick"
+    href="/use-cases/financial-research"
+  >
+    Markets and asset analysis
+  </Card>
+  <Card
+    title="Policy Analysis"
+    icon="landmark"
+    href="/use-cases/policy-analysis"
+  >
+    Policy impact evaluation
+  </Card>
+  <Card
+    title="Examples"
+    icon="code"
+    href="/examples/economic-indicators"
+  >
+    Practical code examples
+  </Card>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/overview"
+  >
+    Tool documentation
+  </Card>
+</CardGroup>
