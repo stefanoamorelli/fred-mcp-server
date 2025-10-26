@@ -1,0 +1,535 @@
+---
+title: Installation
+description: Comprehensive installation guide for all platforms and methods
+icon: 'download'
+---
+
+# Installation Guide
+
+This guide covers all installation methods for the FRED MCP Server across different platforms and deployment scenarios.
+
+## Prerequisites
+
+<CardGroup cols={2}>
+  <Card title="FRED API Key" icon="key">
+    Required for accessing FRED data. Get your free key at [fred.stlouisfed.org](https://fred.stlouisfed.org/docs/api/api_key.html)
+  </Card>
+  <Card title="Node.js 18+" icon="node">
+    Required for running the server. Download from [nodejs.org](https://nodejs.org)
+  </Card>
+</CardGroup>
+
+## Installation Methods
+
+### Method 1: Automatic Installation (Recommended)
+
+<Tabs>
+  <Tab title="Smithery CLI">
+    The easiest installation method using [Smithery](https://smithery.ai):
+
+    ```bash
+    npx -y @smithery/cli install @stefanoamorelli/fred-mcp-server --client claude
+    ```
+
+    **Benefits:**
+    - Automatic configuration
+    - Handles all dependencies
+    - Interactive setup for API key
+    - Updates configuration automatically
+  </Tab>
+
+  <Tab title="NPM Global">
+    Install globally for system-wide access:
+
+    ```bash
+    # Install globally
+    npm install -g fred-mcp-server
+
+    # Verify installation
+    fred-mcp-server --version
+    ```
+
+    **Benefits:**
+    - Available system-wide
+    - Easy updates via npm
+    - Simple command-line usage
+  </Tab>
+
+  <Tab title="NPM Local">
+    Install in a specific project:
+
+    ```bash
+    # Create project directory
+    mkdir my-fred-project
+    cd my-fred-project
+
+    # Initialize and install
+    npm init -y
+    npm install fred-mcp-server
+
+    # Run with npx
+    npx fred-mcp-server
+    ```
+
+    **Benefits:**
+    - Project-specific installation
+    - Version control friendly
+    - No global dependencies
+  </Tab>
+</Tabs>
+
+### Method 2: From Source
+
+<Steps>
+  <Step title="Clone Repository">
+    ```bash
+    git clone https://github.com/stefanoamorelli/fred-mcp-server.git
+    cd fred-mcp-server
+    ```
+  </Step>
+
+  <Step title="Install Dependencies">
+    ```bash
+    # Using pnpm (recommended)
+    pnpm install
+
+    # Or using npm
+    npm install
+
+    # Or using yarn
+    yarn install
+    ```
+  </Step>
+
+  <Step title="Build the Project">
+    ```bash
+    # Build TypeScript
+    pnpm build
+
+    # Or with npm
+    npm run build
+    ```
+  </Step>
+
+  <Step title="Verify Build">
+    ```bash
+    # Test the build
+    node build/index.js --version
+    ```
+  </Step>
+</Steps>
+
+### Method 3: Docker
+
+<Tabs>
+  <Tab title="Pre-built Image">
+    Use the official Docker image:
+
+    ```bash
+    # Pull the latest image
+    docker pull stefanoamorelli/fred-mcp-server:latest
+
+    # Run the container
+    docker run -i --rm \
+      -e FRED_API_KEY=your_api_key_here \
+      stefanoamorelli/fred-mcp-server:latest
+    ```
+  </Tab>
+
+  <Tab title="Build Custom Image">
+    Build your own Docker image:
+
+    ```dockerfile
+    # Dockerfile
+    FROM node:18-alpine
+
+    WORKDIR /app
+
+    # Copy package files
+    COPY package*.json ./
+    RUN npm ci --only=production
+
+    # Copy application
+    COPY . .
+    RUN npm run build
+
+    # Set entrypoint
+    ENTRYPOINT ["node", "build/index.js"]
+    ```
+
+    Build and run:
+
+    ```bash
+    docker build -t my-fred-mcp .
+    docker run -i --rm -e FRED_API_KEY=key my-fred-mcp
+    ```
+  </Tab>
+</Tabs>
+
+## Client Configuration
+
+### Claude Desktop
+
+<Accordion title="Configuration file locations">
+  - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+  - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+  - **Linux**: `~/.config/claude/claude_desktop_config.json`
+</Accordion>
+
+<Tabs>
+  <Tab title="Standard Setup">
+    ```json
+    {
+      "mcpServers": {
+        "fred-mcp": {
+          "command": "fred-mcp-server",
+          "env": {
+            "FRED_API_KEY": "your_api_key_here"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Local Build">
+    ```json
+    {
+      "mcpServers": {
+        "fred-mcp": {
+          "command": "node",
+          "args": ["/path/to/fred-mcp-server/build/index.js"],
+          "env": {
+            "FRED_API_KEY": "your_api_key_here"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Docker">
+    ```json
+    {
+      "mcpServers": {
+        "fred-mcp": {
+          "command": "docker",
+          "args": [
+            "run",
+            "-i",
+            "--rm",
+            "-e",
+            "FRED_API_KEY=your_api_key_here",
+            "stefanoamorelli/fred-mcp-server:latest"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Other MCP Clients
+
+<AccordionGroup>
+  <Accordion title="VSCode Extension">
+    Configure in `.vscode/settings.json`:
+
+    ```json
+    {
+      "mcp.servers": {
+        "fred": {
+          "command": "fred-mcp-server",
+          "env": {
+            "FRED_API_KEY": "${env:FRED_API_KEY}"
+          }
+        }
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Command Line Client">
+    Use with any MCP CLI client:
+
+    ```bash
+    # Set environment variable
+    export FRED_API_KEY="your_api_key"
+
+    # Run with MCP CLI
+    mcp-cli connect fred-mcp-server
+    ```
+  </Accordion>
+
+  <Accordion title="Python Client">
+    Use with Python MCP client:
+
+    ```python
+    from mcp import Client
+    import os
+
+    # Configure client
+    client = Client()
+    client.connect(
+        command="fred-mcp-server",
+        env={"FRED_API_KEY": os.getenv("FRED_API_KEY")}
+    )
+
+    # Use the client
+    result = client.call_tool(
+        "fred_get_series",
+        {"series_id": "GDP", "limit": 10}
+    )
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Environment Variables
+
+<ParamField path="FRED_API_KEY" type="string" required>
+  Your FRED API key from fred.stlouisfed.org
+</ParamField>
+
+<ParamField path="FRED_BASE_URL" type="string" default="https://api.stlouisfed.org/fred">
+  Optional: Override the FRED API base URL
+</ParamField>
+
+<ParamField path="LOG_LEVEL" type="string" default="info">
+  Optional: Set logging level (debug, info, warn, error)
+</ParamField>
+
+## Platform-Specific Instructions
+
+### macOS
+
+<Steps>
+  <Step title="Install Prerequisites">
+    ```bash
+    # Install Homebrew if needed
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # Install Node.js
+    brew install node
+    ```
+  </Step>
+
+  <Step title="Install FRED MCP">
+    ```bash
+    npm install -g fred-mcp-server
+    ```
+  </Step>
+
+  <Step title="Configure Claude">
+    ```bash
+    # Open config in editor
+    code ~/Library/Application\ Support/Claude/claude_desktop_config.json
+    ```
+  </Step>
+</Steps>
+
+### Windows
+
+<Steps>
+  <Step title="Install Prerequisites">
+    1. Download Node.js from [nodejs.org](https://nodejs.org)
+    2. Run the installer with default settings
+    3. Open PowerShell or Command Prompt as Administrator
+  </Step>
+
+  <Step title="Install FRED MCP">
+    ```powershell
+    npm install -g fred-mcp-server
+    ```
+  </Step>
+
+  <Step title="Configure Claude">
+    ```powershell
+    # Open config directory
+    explorer %APPDATA%\Claude
+
+    # Edit claude_desktop_config.json
+    ```
+  </Step>
+</Steps>
+
+### Linux
+
+<Steps>
+  <Step title="Install Prerequisites">
+    ```bash
+    # Ubuntu/Debian
+    sudo apt update
+    sudo apt install nodejs npm
+
+    # Fedora
+    sudo dnf install nodejs npm
+
+    # Arch
+    sudo pacman -S nodejs npm
+    ```
+  </Step>
+
+  <Step title="Install FRED MCP">
+    ```bash
+    sudo npm install -g fred-mcp-server
+    ```
+  </Step>
+
+  <Step title="Configure Claude">
+    ```bash
+    # Create config directory if needed
+    mkdir -p ~/.config/claude
+
+    # Edit configuration
+    nano ~/.config/claude/claude_desktop_config.json
+    ```
+  </Step>
+</Steps>
+
+## Verification
+
+### Test Installation
+
+<CodeGroup>
+```bash Command Line
+# Test the server directly
+FRED_API_KEY=your_key fred-mcp-server
+
+# Should output MCP initialization message
+```
+
+```bash Docker Test
+# Test Docker installation
+docker run -i --rm \
+  -e FRED_API_KEY=your_key \
+  stefanoamorelli/fred-mcp-server:latest \
+  <<< '{"jsonrpc":"2.0","method":"tools/list","id":1}'
+```
+
+```javascript Node.js Test
+// test.js
+const { spawn } = require('child_process');
+
+const server = spawn('fred-mcp-server', [], {
+  env: { ...process.env, FRED_API_KEY: 'your_key' }
+});
+
+server.stdout.on('data', (data) => {
+  console.log(`Server: ${data}`);
+});
+```
+</CodeGroup>
+
+### Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Command not found">
+    **Issue**: `fred-mcp-server: command not found`
+
+    **Solutions**:
+    1. Ensure Node.js is installed: `node --version`
+    2. Check npm global bin path: `npm bin -g`
+    3. Add npm bin to PATH: `export PATH=$PATH:$(npm bin -g)`
+    4. Reinstall: `npm install -g fred-mcp-server`
+  </Accordion>
+
+  <Accordion title="Permission denied">
+    **Issue**: Permission errors during installation
+
+    **Solutions**:
+    - macOS/Linux: Use `sudo npm install -g fred-mcp-server`
+    - Windows: Run as Administrator
+    - Alternative: Install locally without `-g` flag
+  </Accordion>
+
+  <Accordion title="API Key errors">
+    **Issue**: "Invalid API key" or authentication errors
+
+    **Solutions**:
+    1. Verify key at [fred.stlouisfed.org](https://fred.stlouisfed.org)
+    2. Check for typos in configuration
+    3. Ensure proper JSON formatting
+    4. Test key with curl:
+    ```bash
+    curl "https://api.stlouisfed.org/fred/series?series_id=GDP&api_key=YOUR_KEY&file_type=json"
+    ```
+  </Accordion>
+
+  <Accordion title="Docker issues">
+    **Issue**: Docker container exits immediately
+
+    **Solutions**:
+    1. Run with `-it` flags for interactive mode
+    2. Check Docker logs: `docker logs container_id`
+    3. Verify environment variables are passed correctly
+    4. Ensure Docker daemon is running
+  </Accordion>
+</AccordionGroup>
+
+## Updating
+
+### Update Methods
+
+<Tabs>
+  <Tab title="NPM Update">
+    ```bash
+    # Update globally installed version
+    npm update -g fred-mcp-server
+
+    # Or reinstall latest
+    npm install -g fred-mcp-server@latest
+    ```
+  </Tab>
+
+  <Tab title="Git Update">
+    ```bash
+    # In your cloned repository
+    git pull origin main
+    pnpm install
+    pnpm build
+    ```
+  </Tab>
+
+  <Tab title="Docker Update">
+    ```bash
+    # Pull latest image
+    docker pull stefanoamorelli/fred-mcp-server:latest
+
+    # Remove old image (optional)
+    docker image prune
+    ```
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Configuration"
+    icon="gear"
+    href="/configuration"
+  >
+    Advanced configuration options
+  </Card>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/overview"
+  >
+    Explore available tools
+  </Card>
+  <Card
+    title="Examples"
+    icon="flask"
+    href="/examples/basic-usage"
+  >
+    Start using FRED data
+  </Card>
+  <Card
+    title="Troubleshooting"
+    icon="wrench"
+    href="/resources/troubleshooting"
+  >
+    Common issues and solutions
+  </Card>
+</CardGroup>
