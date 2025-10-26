@@ -1,0 +1,557 @@
+---
+title: Economic Indicators
+description: Working with key economic indicators using FRED MCP Server
+icon: 'chart-line'
+---
+
+# Economic Indicators Examples
+
+Learn how to retrieve and analyze key economic indicators using the FRED MCP Server.
+
+## Labor Market Indicators
+
+### Unemployment Rate
+
+Retrieve the monthly unemployment rate:
+
+```javascript
+// Using fred_get_series
+{
+  "series_id": "UNRATE",
+  "observation_start": "2020-01-01",
+  "observation_end": "2024-10-01"
+}
+```
+
+**Response:**
+```json
+{
+  "series_id": "UNRATE",
+  "title": "Unemployment Rate",
+  "units": "Percent",
+  "frequency": "Monthly",
+  "seasonal_adjustment": "Seasonally Adjusted",
+  "observations": [
+    {
+      "date": "2024-09-01",
+      "value": "4.2"
+    },
+    {
+      "date": "2024-08-01",
+      "value": "4.3"
+    }
+  ]
+}
+```
+
+### Labor Force Participation
+
+Track workforce participation trends:
+
+```javascript
+{
+  "series_id": "CIVPART",
+  "observation_start": "2015-01-01"
+}
+```
+
+<Tip>
+  Combine multiple series to understand labor market dynamics:
+  - **UNRATE**: Unemployment rate
+  - **CIVPART**: Labor force participation
+  - **EMRATIO**: Employment-population ratio
+  - **U6RATE**: Broader unemployment measure
+</Tip>
+
+### Nonfarm Payrolls
+
+Monthly employment changes:
+
+```javascript
+{
+  "series_id": "PAYEMS",
+  "observation_start": "2023-01-01",
+  "units": "chg",  // Period-to-period change
+  "frequency": "m"
+}
+```
+
+## Inflation Indicators
+
+### Consumer Price Index (CPI)
+
+Track headline inflation:
+
+```javascript
+{
+  "series_id": "CPIAUCSL",
+  "observation_start": "2020-01-01",
+  "units": "pc1"  // Percent change from year ago
+}
+```
+
+### Core Inflation
+
+CPI excluding volatile food and energy:
+
+```javascript
+{
+  "series_id": "CPILFESL",
+  "observation_start": "2020-01-01",
+  "units": "pc1"
+}
+```
+
+<CodeGroup>
+```javascript Headline CPI
+{
+  "series_id": "CPIAUCSL",
+  "units": "pc1"
+}
+```
+
+```javascript Core CPI
+{
+  "series_id": "CPILFESL",
+  "units": "pc1"
+}
+```
+
+```javascript PCE Price Index
+{
+  "series_id": "PCEPI",
+  "units": "pc1"
+}
+```
+
+```javascript Core PCE
+{
+  "series_id": "PCEPILFE",
+  "units": "pc1"
+}
+```
+</CodeGroup>
+
+### Producer Price Index
+
+Wholesale price changes:
+
+```javascript
+{
+  "series_id": "PPIACO",
+  "observation_start": "2020-01-01",
+  "units": "pc1"
+}
+```
+
+## GDP and Growth
+
+### Real GDP
+
+Inflation-adjusted economic output:
+
+```javascript
+{
+  "series_id": "GDPC1",
+  "observation_start": "2015-Q1",
+  "units": "pca"  // Percent change at annual rate
+}
+```
+
+### Nominal GDP
+
+Current dollar GDP:
+
+```javascript
+{
+  "series_id": "GDP",
+  "observation_start": "2015-Q1",
+  "frequency": "q"
+}
+```
+
+### GDP Components
+
+<Tabs>
+  <Tab title="Consumption">
+    ```javascript
+    {
+      "series_id": "PCEC",
+      "observation_start": "2020-Q1"
+    }
+    ```
+  </Tab>
+
+  <Tab title="Investment">
+    ```javascript
+    {
+      "series_id": "GPDI",
+      "observation_start": "2020-Q1"
+    }
+    ```
+  </Tab>
+
+  <Tab title="Government Spending">
+    ```javascript
+    {
+      "series_id": "GCE",
+      "observation_start": "2020-Q1"
+    }
+    ```
+  </Tab>
+
+  <Tab title="Net Exports">
+    ```javascript
+    {
+      "series_id": "NETEXP",
+      "observation_start": "2020-Q1"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Interest Rates
+
+### Federal Funds Rate
+
+The Fed's primary policy rate:
+
+```javascript
+{
+  "series_id": "DFF",
+  "observation_start": "2020-01-01",
+  "frequency": "d"
+}
+```
+
+### Treasury Yields
+
+<CardGroup cols={2}>
+  <Card title="2-Year Treasury" icon="clock">
+    ```javascript
+    series_id: "DGS2"
+    ```
+  </Card>
+  <Card title="10-Year Treasury" icon="clock">
+    ```javascript
+    series_id: "DGS10"
+    ```
+  </Card>
+  <Card title="30-Year Treasury" icon="clock">
+    ```javascript
+    series_id: "DGS30"
+    ```
+  </Card>
+  <Card title="Yield Curve Spread" icon="chart-area">
+    ```javascript
+    series_id: "T10Y2Y"
+    ```
+  </Card>
+</CardGroup>
+
+### Mortgage Rates
+
+30-year fixed mortgage rate:
+
+```javascript
+{
+  "series_id": "MORTGAGE30US",
+  "observation_start": "2020-01-01",
+  "frequency": "w"
+}
+```
+
+## Financial Markets
+
+### Stock Market Indices
+
+```javascript
+// S&P 500
+{
+  "series_id": "SP500",
+  "observation_start": "2023-01-01"
+}
+
+// Dow Jones Industrial Average
+{
+  "series_id": "DJIA",
+  "observation_start": "2023-01-01"
+}
+
+// NASDAQ Composite
+{
+  "series_id": "NASDAQCOM",
+  "observation_start": "2023-01-01"
+}
+```
+
+### Exchange Rates
+
+<AccordionGroup>
+  <Accordion title="Major Currencies">
+    ```javascript
+    // Euro
+    { "series_id": "DEXUSEU" }
+
+    // British Pound
+    { "series_id": "DEXUSUK" }
+
+    // Japanese Yen
+    { "series_id": "DEXJPUS" }
+
+    // Swiss Franc
+    { "series_id": "DEXSZUS" }
+    ```
+  </Accordion>
+
+  <Accordion title="Emerging Markets">
+    ```javascript
+    // Chinese Yuan
+    { "series_id": "DEXCHUS" }
+
+    // Mexican Peso
+    { "series_id": "DEXMXUS" }
+
+    // Brazilian Real
+    { "series_id": "DEXBZUS" }
+    ```
+  </Accordion>
+
+  <Accordion title="Trade-Weighted">
+    ```javascript
+    // Broad Dollar Index
+    { "series_id": "DTWEXBGS" }
+
+    // Advanced Economies
+    { "series_id": "DTWEXAFEGS" }
+
+    // Emerging Markets
+    { "series_id": "DTWEXEMEGS" }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Production Indicators
+
+### Industrial Production
+
+```javascript
+{
+  "series_id": "INDPRO",
+  "observation_start": "2020-01-01",
+  "units": "pc1"
+}
+```
+
+### Manufacturing
+
+```javascript
+// Manufacturing Output
+{
+  "series_id": "IPMAN",
+  "observation_start": "2020-01-01"
+}
+
+// Capacity Utilization
+{
+  "series_id": "TCU",
+  "observation_start": "2020-01-01"
+}
+```
+
+### Housing
+
+<Steps>
+  <Step title="Housing Starts">
+    ```javascript
+    { "series_id": "HOUST" }
+    ```
+  </Step>
+
+  <Step title="Building Permits">
+    ```javascript
+    { "series_id": "PERMIT" }
+    ```
+  </Step>
+
+  <Step title="Existing Home Sales">
+    ```javascript
+    { "series_id": "EXHOSLUSM495S" }
+    ```
+  </Step>
+
+  <Step title="Home Price Index">
+    ```javascript
+    { "series_id": "CSUSHPISA" }
+    ```
+  </Step>
+</Steps>
+
+## Consumer Indicators
+
+### Retail Sales
+
+```javascript
+{
+  "series_id": "RSXFS",
+  "observation_start": "2020-01-01",
+  "units": "pch"
+}
+```
+
+### Consumer Confidence
+
+```javascript
+// University of Michigan Consumer Sentiment
+{
+  "series_id": "UMCSENT",
+  "observation_start": "2020-01-01"
+}
+
+// Conference Board Consumer Confidence
+{
+  "series_id": "CSCICP03USM665S",
+  "observation_start": "2020-01-01"
+}
+```
+
+### Personal Income and Spending
+
+<Tabs>
+  <Tab title="Personal Income">
+    ```javascript
+    {
+      "series_id": "PI",
+      "observation_start": "2020-01-01",
+      "units": "pc1"
+    }
+    ```
+  </Tab>
+
+  <Tab title="Personal Spending">
+    ```javascript
+    {
+      "series_id": "PCE",
+      "observation_start": "2020-01-01",
+      "units": "pc1"
+    }
+    ```
+  </Tab>
+
+  <Tab title="Savings Rate">
+    ```javascript
+    {
+      "series_id": "PSAVERT",
+      "observation_start": "2020-01-01"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Money Supply
+
+### Monetary Aggregates
+
+```javascript
+// M1 Money Supply
+{
+  "series_id": "M1SL",
+  "observation_start": "2020-01-01",
+  "units": "pc1"
+}
+
+// M2 Money Supply
+{
+  "series_id": "M2SL",
+  "observation_start": "2020-01-01",
+  "units": "pc1"
+}
+```
+
+## Searching for Indicators
+
+Find indicators by topic:
+
+```javascript
+// Search for inflation indicators
+{
+  "query": "inflation",
+  "tags": ["monthly", "sa"],
+  "limit": 20,
+  "sort_by": "popularity"
+}
+
+// Search for employment
+{
+  "query": "employment",
+  "tags": ["bls", "monthly"],
+  "limit": 20
+}
+```
+
+## Best Practices
+
+<Warning>
+  **Key considerations when working with indicators:**
+
+  - **Frequency**: Match series frequencies for comparisons
+  - **Seasonal Adjustment**: Use SA versions for trend analysis
+  - **Units**: Verify units before calculations
+  - **Revisions**: Economic data undergoes revisions
+  - **Release Dates**: Check when data is typically updated
+</Warning>
+
+### Combining Multiple Indicators
+
+```javascript
+// Create dashboard of key indicators
+const dashboard = [
+  { id: "UNRATE", name: "Unemployment" },
+  { id: "CPIAUCSL", name: "CPI", transform: "pc1" },
+  { id: "GDP", name: "GDP", transform: "pca" },
+  { id: "DFF", name: "Fed Funds Rate" },
+  { id: "SP500", name: "S&P 500" }
+];
+
+// Fetch all in date range
+dashboard.forEach(indicator => {
+  fred_get_series({
+    series_id: indicator.id,
+    observation_start: "2020-01-01",
+    units: indicator.transform || "lin"
+  });
+});
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Time Series Analysis"
+    icon="chart-line"
+    href="/examples/time-series-analysis"
+  >
+    Analyze trends and patterns
+  </Card>
+  <Card
+    title="Data Transformations"
+    icon="calculator"
+    href="/examples/data-transformations"
+  >
+    Transform data for analysis
+  </Card>
+  <Card
+    title="Common Series"
+    icon="bookmark"
+    href="/resources/common-series"
+  >
+    Popular indicator reference
+  </Card>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/overview"
+  >
+    Tool documentation
+  </Card>
+</CardGroup>

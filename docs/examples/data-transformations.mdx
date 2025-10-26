@@ -1,0 +1,627 @@
+---
+title: Data Transformations
+description: Transform economic data for analysis and comparison
+icon: 'calculator'
+---
+
+# Data Transformations
+
+FRED provides powerful transformation capabilities to prepare data for analysis. Learn how to apply transformations directly in your requests.
+
+## Transformation Types
+
+### Levels (lin)
+
+Raw, untransformed data:
+
+```javascript
+{
+  "series_id": "GDP",
+  "observation_start": "2020-Q1",
+  "units": "lin"  // Default, can be omitted
+}
+```
+
+**Output:**
+```json
+[
+  { "date": "2024-Q2", "value": "28647.8" },
+  { "date": "2024-Q1", "value": "28435.1" }
+]
+```
+
+<Note>
+  Units: Billions of Dollars
+</Note>
+
+### Change (chg)
+
+Absolute period-to-period change:
+
+```javascript
+{
+  "series_id": "GDP",
+  "observation_start": "2020-Q1",
+  "units": "chg"
+}
+```
+
+**Formula:** `x_t - x_{t-1}`
+
+**Output:**
+```json
+[
+  { "date": "2024-Q2", "value": "212.7" },
+  { "date": "2024-Q1", "value": "157.3" }
+]
+```
+
+**Use cases:**
+- Quarterly GDP additions
+- Monthly employment changes
+- Period-over-period differences
+
+### Percent Change (pch)
+
+Period-to-period percentage change:
+
+```javascript
+{
+  "series_id": "GDP",
+  "observation_start": "2020-Q1",
+  "units": "pch"
+}
+```
+
+**Formula:** `((x_t / x_{t-1}) - 1) * 100`
+
+**Output:**
+```json
+[
+  { "date": "2024-Q2", "value": "0.75" },
+  { "date": "2024-Q1", "value": "0.56" }
+]
+```
+
+**Use cases:**
+- Month-over-month inflation
+- Quarter-over-quarter growth
+- Short-term momentum
+
+### Percent Change from Year Ago (pc1)
+
+Year-over-year percentage change:
+
+```javascript
+{
+  "series_id": "CPIAUCSL",
+  "observation_start": "2020-01-01",
+  "units": "pc1"
+}
+```
+
+**Formula:** `((x_t / x_{t-n}) - 1) * 100`
+
+where `n` = periods in a year
+
+**Output:**
+```json
+[
+  { "date": "2024-09-01", "value": "2.4" },
+  { "date": "2024-08-01", "value": "2.5" }
+]
+```
+
+**Use cases:**
+- Annual inflation rates
+- Year-over-year GDP growth
+- Annual wage growth
+
+<Tip>
+  **pc1** is the most common transformation for inflation and growth rates
+</Tip>
+
+### Compounded Annual Rate of Change (pca)
+
+Annualized growth rate:
+
+```javascript
+{
+  "series_id": "GDPC1",
+  "observation_start": "2020-Q1",
+  "units": "pca"
+}
+```
+
+**Formula:** `(((x_t / x_{t-1})^(n)) - 1) * 100`
+
+where `n` = periods per year
+
+**Output:**
+```json
+[
+  { "date": "2024-Q2", "value": "3.0" },
+  { "date": "2024-Q1", "value": "1.4" }
+]
+```
+
+**Use cases:**
+- Quarterly GDP at annual rates (official reporting)
+- Annualizing monthly growth
+
+<Warning>
+  **pca** compounds the growth rate. A 0.75% quarterly growth becomes ~3% annual rate.
+</Warning>
+
+### Change from Year Ago (ch1)
+
+Absolute change from same period last year:
+
+```javascript
+{
+  "series_id": "PAYEMS",
+  "observation_start": "2020-01-01",
+  "units": "ch1"
+}
+```
+
+**Formula:** `x_t - x_{t-n}`
+
+**Output:**
+```json
+[
+  { "date": "2024-09-01", "value": "2543" },
+  { "date": "2024-08-01", "value": "2619" }
+]
+```
+
+**Use cases:**
+- Year-over-year job gains
+- Annual change in levels
+
+### Continuously Compounded Rate (cch)
+
+Log difference (percentage):
+
+```javascript
+{
+  "series_id": "SP500",
+  "observation_start": "2020-01-01",
+  "units": "cch"
+}
+```
+
+**Formula:** `(ln(x_t) - ln(x_{t-1})) * 100`
+
+**Output:**
+```json
+[
+  { "date": "2024-10-25", "value": "0.52" },
+  { "date": "2024-10-24", "value": "-0.18" }
+]
+```
+
+**Use cases:**
+- Financial returns analysis
+- Statistical modeling
+- Volatility calculations
+
+### Continuously Compounded Annual Rate (cca)
+
+Log difference annualized:
+
+```javascript
+{
+  "series_id": "GDP",
+  "observation_start": "2020-Q1",
+  "units": "cca"
+}
+```
+
+**Formula:** `(ln(x_t) - ln(x_{t-n})) * 100`
+
+**Use cases:**
+- Academic research
+- Econometric modeling
+
+### Natural Log (log)
+
+Logarithmic transformation:
+
+```javascript
+{
+  "series_id": "GDP",
+  "observation_start": "2020-Q1",
+  "units": "log"
+}
+```
+
+**Formula:** `ln(x_t)`
+
+**Output:**
+```json
+[
+  { "date": "2024-Q2", "value": "10.2627" },
+  { "date": "2024-Q1", "value": "10.2553" }
+]
+```
+
+**Use cases:**
+- Identifying exponential trends
+- Statistical analysis requiring normality
+- Growth rate calculations
+
+## Transformation Selection Guide
+
+### By Use Case
+
+<Tabs>
+  <Tab title="Headlines & Reporting">
+    ```javascript
+    // Year-over-year (most common for news)
+    { "units": "pc1" }
+
+    // Annualized rate (GDP reporting)
+    { "units": "pca" }
+    ```
+  </Tab>
+
+  <Tab title="Trend Analysis">
+    ```javascript
+    // Original levels
+    { "units": "lin" }
+
+    // Log transformation for exponential trends
+    { "units": "log" }
+    ```
+  </Tab>
+
+  <Tab title="Momentum Analysis">
+    ```javascript
+    // Month-over-month
+    { "units": "pch" }
+
+    // Absolute changes
+    { "units": "chg" }
+    ```
+  </Tab>
+
+  <Tab title="Statistical Analysis">
+    ```javascript
+    // Log returns
+    { "units": "cch" }
+
+    // Log levels
+    { "units": "log" }
+    ```
+  </Tab>
+</Tabs>
+
+### By Data Frequency
+
+| Frequency | Common Transformations | Example |
+|-----------|----------------------|---------|
+| Daily | lin, pch, cch | Stock returns |
+| Weekly | lin, pch, pc1 | Initial claims |
+| Monthly | pc1, pch, ch1 | Inflation, employment |
+| Quarterly | pca, pc1, log | GDP growth |
+| Annual | pc1, chg | Demographics |
+
+## Practical Examples
+
+### Inflation Analysis
+
+<CodeGroup>
+```javascript Month-over-Month
+{
+  "series_id": "CPIAUCSL",
+  "units": "pch"
+}
+// Shows monthly price changes
+```
+
+```javascript Year-over-Year
+{
+  "series_id": "CPIAUCSL",
+  "units": "pc1"
+}
+// Standard inflation reporting
+```
+
+```javascript Annualized Monthly
+{
+  "series_id": "CPIAUCSL",
+  "units": "pca"
+}
+// Monthly change at annual rate
+```
+</CodeGroup>
+
+### GDP Growth
+
+<CodeGroup>
+```javascript Quarter-over-Quarter
+{
+  "series_id": "GDPC1",
+  "units": "pch"
+}
+// Simple quarterly growth
+```
+
+```javascript Annualized (Official)
+{
+  "series_id": "GDPC1",
+  "units": "pca"
+}
+// BEA's official reporting method
+```
+
+```javascript Year-over-Year
+{
+  "series_id": "GDPC1",
+  "units": "pc1"
+}
+// Annual comparison
+```
+</CodeGroup>
+
+### Employment Changes
+
+<CodeGroup>
+```javascript Monthly Change
+{
+  "series_id": "PAYEMS",
+  "units": "chg"
+}
+// Net jobs added/lost (in thousands)
+```
+
+```javascript Year-over-Year
+{
+  "series_id": "PAYEMS",
+  "units": "ch1"
+}
+// Annual job growth (in thousands)
+```
+
+```javascript Growth Rate
+{
+  "series_id": "PAYEMS",
+  "units": "pc1"
+}
+// Percentage employment growth
+```
+</CodeGroup>
+
+## Combining Transformations
+
+### Compare Multiple Views
+
+```javascript
+// Original levels
+const levels = {
+  "series_id": "UNRATE",
+  "observation_start": "2020-01-01",
+  "units": "lin"
+};
+
+// Month-over-month change
+const monthly = {
+  "series_id": "UNRATE",
+  "observation_start": "2020-01-01",
+  "units": "chg"
+};
+
+// Year-over-year change
+const annual = {
+  "series_id": "UNRATE",
+  "observation_start": "2020-01-01",
+  "units": "ch1"
+};
+```
+
+### Growth Decomposition
+
+```javascript
+// Nominal GDP growth
+const nominal = {
+  "series_id": "GDP",
+  "units": "pc1"
+};
+
+// Real GDP growth
+const real = {
+  "series_id": "GDPC1",
+  "units": "pc1"
+};
+
+// Implicit: Price change ≈ Nominal - Real
+```
+
+## Advanced Techniques
+
+### Detrending
+
+Remove long-term trends using logs:
+
+```javascript
+// Step 1: Get log values
+{
+  "series_id": "GDPC1",
+  "observation_start": "2000-Q1",
+  "units": "log"
+}
+
+// Step 2: Calculate deviations from trend
+// (done in analysis tool)
+```
+
+### Volatility Measurement
+
+Use continuous compounding for returns:
+
+```javascript
+{
+  "series_id": "SP500",
+  "observation_start": "2023-01-01",
+  "units": "cch"  // Daily log returns
+}
+
+// Calculate standard deviation for volatility
+```
+
+### Real vs Nominal
+
+Deflate nominal series:
+
+```javascript
+// Nominal wages
+const nominal_wages = {
+  "series_id": "CES0500000003"
+};
+
+// CPI (for deflation)
+const cpi = {
+  "series_id": "CPIAUCSL"
+};
+
+// Real wages = (Nominal / CPI) * 100
+```
+
+<Note>
+  FRED often provides pre-calculated real series (look for "Real" in title)
+</Note>
+
+## Common Pitfalls
+
+<AccordionGroup>
+  <Accordion title="Mixing Frequencies">
+    ❌ **Don't:** Compare monthly % change with quarterly
+    ```javascript
+    { "series_id": "CPIAUCSL", "units": "pch" }  // Monthly
+    { "series_id": "GDP", "units": "pch" }       // Quarterly
+    ```
+
+    ✅ **Do:** Use consistent frequencies
+    ```javascript
+    { "series_id": "CPIAUCSL", "units": "pc1" }  // Annual
+    { "series_id": "GDP", "units": "pc1" }       // Annual
+    ```
+  </Accordion>
+
+  <Accordion title="Transformation on Transformations">
+    ❌ **Don't:** Apply transformations to already-transformed series
+    ```javascript
+    // Series ending in "CHG" or "PC1" are already transformed
+    { "series_id": "GDPC1CHG", "units": "pch" }  // Wrong!
+    ```
+
+    ✅ **Do:** Use base series
+    ```javascript
+    { "series_id": "GDPC1", "units": "pch" }  // Correct
+    ```
+  </Accordion>
+
+  <Accordion title="Ignoring Units">
+    ❌ **Don't:** Forget to check original units
+    ```javascript
+    // Some series are in billions, others in thousands
+    { "series_id": "GDP" }      // Billions
+    { "series_id": "PAYEMS" }   // Thousands
+    ```
+
+    ✅ **Do:** Verify units in response
+  </Accordion>
+
+  <Accordion title="Seasonality Issues">
+    ❌ **Don't:** Use NSA data for growth rates
+    ```javascript
+    { "series_id": "UNRATENSA", "units": "pch" }  // Seasonal distortion
+    ```
+
+    ✅ **Do:** Use SA data for comparisons
+    ```javascript
+    { "series_id": "UNRATE", "units": "pch" }  // Seasonally adjusted
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Transformation Reference
+
+### Quick Reference Table
+
+| Code | Name | Formula | Period | Use Case |
+|------|------|---------|--------|----------|
+| lin | Levels | x_t | - | Raw data |
+| chg | Change | x_t - x_{t-1} | Prior | Absolute change |
+| ch1 | Change YoY | x_t - x_{t-n} | Year ago | Annual absolute change |
+| pch | % Change | ((x_t/x_{t-1})-1)*100 | Prior | Growth rate |
+| pc1 | % Change YoY | ((x_t/x_{t-n})-1)*100 | Year ago | Annual growth |
+| pca | Compounded Annual | (((x_t/x_{t-1})^n)-1)*100 | Annual | Annualized rate |
+| cch | Log Change | (ln(x_t)-ln(x_{t-1}))*100 | Prior | Log returns |
+| cca | Log Change Annual | (ln(x_t)-ln(x_{t-n}))*100 | Annual | Annual log returns |
+| log | Natural Log | ln(x_t) | - | Log levels |
+
+### Frequency Multipliers (n)
+
+| Frequency | n (per year) |
+|-----------|--------------|
+| Daily | 365 (business) / 260 (trading) |
+| Weekly | 52 |
+| Monthly | 12 |
+| Quarterly | 4 |
+| Semi-annual | 2 |
+| Annual | 1 |
+
+## Best Practices
+
+<Steps>
+  <Step title="Start with Levels">
+    Always examine raw data first to understand scale and patterns
+  </Step>
+
+  <Step title="Match Use Case">
+    Choose transformation based on your analysis needs
+  </Step>
+
+  <Step title="Document Choices">
+    Note which transformations you applied for reproducibility
+  </Step>
+
+  <Step title="Verify Results">
+    Sanity-check transformed values against known economic facts
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Time Series Analysis"
+    icon="chart-line"
+    href="/examples/time-series-analysis"
+  >
+    Analyze transformed data
+  </Card>
+  <Card
+    title="Advanced Queries"
+    icon="magnifying-glass-chart"
+    href="/examples/advanced-queries"
+  >
+    Complex data retrieval
+  </Card>
+  <Card
+    title="Economic Indicators"
+    icon="chart-mixed"
+    href="/examples/economic-indicators"
+  >
+    Common indicator patterns
+  </Card>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/fred-get-series"
+  >
+    Full transformation docs
+  </Card>
+</CardGroup>

@@ -1,0 +1,682 @@
+---
+title: Advanced Queries
+description: Complex search patterns and data retrieval strategies
+icon: 'magnifying-glass-chart'
+---
+
+# Advanced Queries
+
+Master complex search patterns, filtering techniques, and efficient data retrieval strategies using the FRED MCP Server.
+
+## Advanced Search
+
+### Multi-term Search
+
+Combine multiple keywords:
+
+```javascript
+{
+  "query": "unemployment rate seasonally adjusted",
+  "limit": 20,
+  "sort_by": "popularity"
+}
+```
+
+**Search strategies:**
+- More specific terms = fewer, more relevant results
+- Include seasonal adjustment status
+- Add frequency (monthly, quarterly)
+- Specify geographic scope (national, state)
+
+### Wildcard Patterns
+
+Use partial series IDs:
+
+```javascript
+{
+  "query": "UNRATE*",
+  "search_type": "series_id"
+}
+```
+
+Returns:
+- UNRATE (National)
+- UNRATENSA (Not seasonally adjusted)
+- UNRATEUSA (Alternate series)
+
+### Source-Specific Searches
+
+Find series from specific agencies:
+
+<Tabs>
+  <Tab title="Bureau of Labor Statistics">
+    ```javascript
+    {
+      "query": "employment",
+      "tags": ["bls"],
+      "limit": 50
+    }
+    ```
+  </Tab>
+
+  <Tab title="Bureau of Economic Analysis">
+    ```javascript
+    {
+      "query": "gdp",
+      "tags": ["bea"],
+      "limit": 50
+    }
+    ```
+  </Tab>
+
+  <Tab title="Federal Reserve Board">
+    ```javascript
+    {
+      "query": "interest rate",
+      "tags": ["frb"],
+      "limit": 50
+    }
+    ```
+  </Tab>
+
+  <Tab title="Census Bureau">
+    ```javascript
+    {
+      "query": "housing",
+      "tags": ["census"],
+      "limit": 50
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Tag-Based Filtering
+
+### Multiple Tag Combinations
+
+```javascript
+{
+  "query": "inflation",
+  "tags": ["monthly", "sa", "usa"],
+  "tag_mode": "all"  // Must match all tags
+}
+```
+
+**Common tag combinations:**
+
+<CardGroup cols={2}>
+  <Card title="National Monthly SA" icon="flag-usa">
+    ```javascript
+    ["monthly", "sa", "usa"]
+    ```
+  </Card>
+  <Card title="Quarterly National Accounts" icon="landmark">
+    ```javascript
+    ["quarterly", "bea", "nipa"]
+    ```
+  </Card>
+  <Card title="Daily Financial Data" icon="chart-candlestick">
+    ```javascript
+    ["daily", "finance", "rates"]
+    ```
+  </Card>
+  <Card title="State-Level Data" icon="map">
+    ```javascript
+    ["state", "monthly", "sa"]
+    ```
+  </Card>
+</CardGroup>
+
+### Tag Discovery
+
+Find related tags:
+
+```javascript
+{
+  "query": "employment",
+  "include_observation_values": false,
+  "sort_by": "popularity"
+}
+```
+
+Then examine tags in results to refine search.
+
+## Category-Based Browsing
+
+### Navigate Hierarchy
+
+<Steps>
+  <Step title="Start at Root">
+    ```javascript
+    {
+      "category_id": 0
+    }
+    ```
+    Returns top-level categories
+  </Step>
+
+  <Step title="Drill Down">
+    ```javascript
+    {
+      "category_id": 10  // Employment & Labor
+    }
+    ```
+    Returns subcategories
+  </Step>
+
+  <Step title="Get Series">
+    ```javascript
+    {
+      "category_id": 11,  // Current Employment Statistics
+      "limit": 100
+    }
+    ```
+    Returns series in category
+  </Step>
+</Steps>
+
+### Popular Categories
+
+| Category ID | Name | Series Count |
+|-------------|------|--------------|
+| 32991 | Money, Banking & Finance | ~10,000 |
+| 10 | Population, Employment & Labor | ~15,000 |
+| 1 | Production & Business Activity | ~40,000 |
+| 32455 | Prices | ~25,000 |
+| 32263 | International Data | ~60,000 |
+| 3008 | U.S. Regional Data | ~30,000 |
+
+## Geographic Queries
+
+### State-Level Data
+
+Find data for specific states:
+
+```javascript
+{
+  "query": "unemployment rate",
+  "tags": ["state", "monthly", "sa"],
+  "limit": 50
+}
+```
+
+**State code patterns:**
+- Format: `{INDICATOR}{STATE}`
+- Example: `CAUR` (California Unemployment Rate)
+
+<AccordionGroup>
+  <Accordion title="California Data">
+    ```javascript
+    // Unemployment
+    { "series_id": "CAUR" }
+
+    // GDP
+    { "series_id": "CANGSP" }
+
+    // Home Price Index
+    { "series_id": "CASTHPI" }
+    ```
+  </Accordion>
+
+  <Accordion title="Texas Data">
+    ```javascript
+    // Unemployment
+    { "series_id": "TXUR" }
+
+    // GDP
+    { "series_id": "TXNGSP" }
+
+    // Home Price Index
+    { "series_id": "TXSTHPI" }
+    ```
+  </Accordion>
+
+  <Accordion title="New York Data">
+    ```javascript
+    // Unemployment
+    { "series_id": "NYUR" }
+
+    // GDP
+    { "series_id": "NYNGSP" }
+
+    // Home Price Index
+    { "series_id": "NYSTHPI" }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Metro Area Data
+
+Metropolitan Statistical Areas (MSAs):
+
+```javascript
+{
+  "query": "unemployment rate",
+  "tags": ["msa", "monthly"],
+  "limit": 100
+}
+```
+
+**Example MSAs:**
+- **LAUMT064910**: Los Angeles-Long Beach-Anaheim
+- **LAUMT364190**: New York-Newark-Jersey City
+- **LAUMT121410**: Chicago-Naperville-Elgin
+
+### International Data
+
+```javascript
+{
+  "query": "gdp",
+  "tags": ["oecd"],
+  "limit": 50
+}
+
+// Or specific countries
+{
+  "query": "gdp japan",
+  "limit": 20
+}
+```
+
+## Frequency-Specific Searches
+
+### Daily Data
+
+```javascript
+{
+  "tags": ["daily"],
+  "query": "interest rate",
+  "limit": 20
+}
+```
+
+**Common daily series:**
+- Treasury yields (DGS2, DGS10, DGS30)
+- Fed funds rate (DFF)
+- Exchange rates (DEXUSEU, DEXJPUS)
+- Stock indices (SP500, DJIA)
+
+### High-Frequency Financial
+
+```javascript
+{
+  "tags": ["daily", "finance"],
+  "sort_by": "popularity",
+  "limit": 50
+}
+```
+
+### Low-Frequency Data
+
+Annual or less frequent:
+
+```javascript
+{
+  "tags": ["annual"],
+  "query": "population",
+  "limit": 30
+}
+```
+
+## Date Range Optimization
+
+### Recent Data Only
+
+```javascript
+{
+  "series_id": "GDP",
+  "observation_start": "2020-Q1",
+  "observation_end": "2024-Q3"
+}
+```
+
+<Tip>
+  Limiting date ranges reduces API payload size and improves performance
+</Tip>
+
+### Historical Analysis
+
+Long-term series:
+
+```javascript
+{
+  "series_id": "CPIAUCSL",
+  "observation_start": "1947-01-01",  // Series inception
+  "observation_end": "2024-10-01"
+}
+```
+
+### Rolling Windows
+
+Get last N periods:
+
+```javascript
+{
+  "series_id": "UNRATE",
+  "observation_start": "2023-01-01",  // Last ~20 months
+  "sort_order": "desc",
+  "limit": 20
+}
+```
+
+## Complex Filtering
+
+### Popularity Threshold
+
+Focus on commonly-used series:
+
+```javascript
+{
+  "query": "gdp",
+  "sort_by": "popularity",
+  "limit": 100
+}
+```
+
+Filter results where popularity > 50:
+```javascript
+results.filter(series => series.popularity > 50)
+```
+
+### Frequency Filtering
+
+Find only monthly series:
+
+```javascript
+{
+  "query": "inflation",
+  "tags": ["monthly"]
+}
+```
+
+### Seasonal Adjustment
+
+Prefer seasonally adjusted:
+
+```javascript
+{
+  "query": "retail sales",
+  "tags": ["sa"]  // Seasonally adjusted only
+}
+```
+
+## Batch Retrieval
+
+### Multiple Series
+
+Retrieve related series efficiently:
+
+```javascript
+const series_ids = [
+  "UNRATE",    // Unemployment
+  "CPIAUCSL",  // CPI
+  "GDP",       // GDP
+  "DFF",       // Fed Funds
+  "SP500"      // Stock Market
+];
+
+// Request each
+series_ids.forEach(id => {
+  fred_get_series({
+    series_id: id,
+    observation_start: "2020-01-01"
+  });
+});
+```
+
+### Category Sweep
+
+Get all series in a category:
+
+```javascript
+{
+  "category_id": 11,  // Current Employment Statistics
+  "limit": 1000,      // Max per request
+  "offset": 0
+}
+
+// If more than 1000, paginate:
+// offset: 1000, 2000, 3000, etc.
+```
+
+## Search Optimization
+
+### Precision vs Recall
+
+<Tabs>
+  <Tab title="High Precision">
+    ```javascript
+    {
+      "query": "UNRATE",  // Exact ID
+      "search_type": "series_id"
+    }
+    ```
+    Returns: 1 exact match
+  </Tab>
+
+  <Tab title="High Recall">
+    ```javascript
+    {
+      "query": "unemployment"  // Broad term
+    }
+    ```
+    Returns: ~500 related series
+  </Tab>
+
+  <Tab title="Balanced">
+    ```javascript
+    {
+      "query": "unemployment rate monthly",
+      "tags": ["sa", "usa"],
+      "limit": 20
+    }
+    ```
+    Returns: 20 most relevant
+  </Tab>
+</Tabs>
+
+### Sort Strategies
+
+<AccordionGroup>
+  <Accordion title="By Popularity">
+    ```javascript
+    { "sort_by": "popularity" }
+    ```
+    Best for: Finding commonly-used series
+  </Accordion>
+
+  <Accordion title="By Name">
+    ```javascript
+    {
+      "sort_by": "title",
+      "sort_order": "asc"
+    }
+    ```
+    Best for: Alphabetical browsing
+  </Accordion>
+
+  <Accordion title="By Date">
+    ```javascript
+    {
+      "sort_by": "last_updated",
+      "sort_order": "desc"
+    }
+    ```
+    Best for: Finding recently updated data
+  </Accordion>
+
+  <Accordion title="By Series ID">
+    ```javascript
+    {
+      "sort_by": "series_id",
+      "sort_order": "asc"
+    }
+    ```
+    Best for: Finding related series by ID pattern
+  </Accordion>
+</AccordionGroup>
+
+## Real-World Query Patterns
+
+### Economic Dashboard
+
+Build a monitoring dashboard:
+
+```javascript
+const dashboard_queries = [
+  // Labor Market
+  {
+    series_ids: ["UNRATE", "PAYEMS", "CIVPART"],
+    start: "2020-01-01",
+    transform: "lin"
+  },
+
+  // Inflation
+  {
+    series_ids: ["CPIAUCSL", "CPILFESL", "PCEPI"],
+    start: "2020-01-01",
+    transform: "pc1"
+  },
+
+  // Growth
+  {
+    series_ids: ["GDP", "GDPC1", "INDPRO"],
+    start: "2020-Q1",
+    transform: "pca"
+  },
+
+  // Markets
+  {
+    series_ids: ["DFF", "DGS10", "SP500"],
+    start: "2020-01-01",
+    transform: "lin"
+  }
+];
+```
+
+### Comparative Analysis
+
+Compare across geographies:
+
+```javascript
+const states = ["CA", "TX", "NY", "FL"];
+const indicator = "UR";  // Unemployment Rate
+
+states.forEach(state => {
+  fred_get_series({
+    series_id: `${state}${indicator}`,
+    observation_start: "2020-01-01"
+  });
+});
+```
+
+### Historical Research
+
+Long-term trend analysis:
+
+```javascript
+{
+  "series_id": "CPIAUCSL",
+  "observation_start": "1947-01-01",  // Full history
+  "units": "pc1",  // Annual inflation
+  "frequency": "a",  // Annual frequency
+  "aggregation_method": "eop"  // End of period
+}
+```
+
+### Nowcasting
+
+Get most recent values:
+
+```javascript
+{
+  "series_id": "UNRATE",
+  "sort_order": "desc",
+  "limit": 1  // Just the latest
+}
+```
+
+## Performance Tips
+
+<Steps>
+  <Step title="Use Specific IDs">
+    When known, use exact series IDs instead of search
+  </Step>
+
+  <Step title="Limit Date Ranges">
+    Request only needed time periods
+  </Step>
+
+  <Step title="Apply Filters Early">
+    Use tags to narrow before searching
+  </Step>
+
+  <Step title="Plan Data Needs">
+    Identify what data you need upfront to avoid redundant calls
+  </Step>
+
+  <Step title="Batch Related Queries">
+    Group similar requests together
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<Warning>
+  **Common issues:**
+
+  - **No results**: Query too specific, try broader terms
+  - **Too many results**: Add tags or more specific terms
+  - **Slow queries**: Reduce date range or result limit
+  - **Unexpected series**: Check tags and sort order
+</Warning>
+
+### Query Refinement
+
+```javascript
+// Too broad (10,000 results)
+{ "query": "rate" }
+
+// Better (500 results)
+{ "query": "interest rate" }
+
+// Best (20 results)
+{
+  "query": "interest rate",
+  "tags": ["daily", "treasury"],
+  "limit": 20
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/overview"
+  >
+    Complete tool documentation
+  </Card>
+  <Card
+    title="Economic Analysis"
+    icon="chart-mixed"
+    href="/use-cases/economic-analysis"
+  >
+    Applied analysis patterns
+  </Card>
+  <Card
+    title="Common Series"
+    icon="bookmark"
+    href="/resources/common-series"
+  >
+    Popular series reference
+  </Card>
+  <Card
+    title="Troubleshooting"
+    icon="wrench"
+    href="/resources/troubleshooting"
+  >
+    Solve common issues
+  </Card>
+</CardGroup>

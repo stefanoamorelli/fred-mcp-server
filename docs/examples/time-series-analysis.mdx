@@ -1,0 +1,608 @@
+---
+title: Time Series Analysis
+description: Analyzing trends, patterns, and relationships in economic data
+icon: 'chart-line'
+---
+
+# Time Series Analysis
+
+Learn how to analyze economic trends, identify patterns, and compare time series data using the FRED MCP Server.
+
+## Trend Analysis
+
+### Long-Term Trends
+
+Analyze unemployment over decades:
+
+```javascript
+{
+  "series_id": "UNRATE",
+  "observation_start": "1980-01-01",
+  "observation_end": "2024-10-01"
+}
+```
+
+**Key insights to look for:**
+- Cyclical peaks and troughs
+- Long-term structural changes
+- Recovery patterns after recessions
+
+### Growth Rates
+
+Calculate year-over-year growth:
+
+```javascript
+{
+  "series_id": "GDP",
+  "observation_start": "2010-Q1",
+  "units": "pc1"  // Percent change from year ago
+}
+```
+
+<Tabs>
+  <Tab title="Annualized Growth">
+    ```javascript
+    {
+      "series_id": "GDPC1",
+      "units": "pca"  // Percent change at annual rate
+    }
+    ```
+  </Tab>
+
+  <Tab title="Quarter-over-Quarter">
+    ```javascript
+    {
+      "series_id": "GDPC1",
+      "units": "pch"  // Percent change from prior period
+    }
+    ```
+  </Tab>
+
+  <Tab title="Year-over-Year">
+    ```javascript
+    {
+      "series_id": "GDPC1",
+      "units": "pc1"  // Percent change from year ago
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Cyclical Analysis
+
+### Business Cycles
+
+Identify recession periods using unemployment:
+
+```javascript
+{
+  "series_id": "UNRATE",
+  "observation_start": "2000-01-01"
+}
+```
+
+Combine with recession indicator:
+
+```javascript
+{
+  "series_id": "USREC",  // NBER Recession Indicator
+  "observation_start": "2000-01-01"
+}
+```
+
+<Note>
+  **USREC** series: Value of 1 indicates recession period, 0 indicates expansion
+</Note>
+
+### Leading Indicators
+
+Track predictive indicators:
+
+```javascript
+// Leading Economic Index
+{
+  "series_id": "USSLIND",
+  "observation_start": "2015-01-01"
+}
+
+// Building Permits (leads housing)
+{
+  "series_id": "PERMIT",
+  "observation_start": "2015-01-01"
+}
+
+// Initial Claims (leads employment)
+{
+  "series_id": "ICSA",
+  "observation_start": "2015-01-01"
+}
+```
+
+## Seasonal Patterns
+
+### Comparing SA vs NSA Data
+
+```javascript
+// Seasonally Adjusted
+{
+  "series_id": "UNRATE",  // SA version
+  "observation_start": "2023-01-01"
+}
+
+// Not Seasonally Adjusted
+{
+  "series_id": "UNRATENSA",  // NSA version
+  "observation_start": "2023-01-01"
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Seasonally Adjusted" icon="chart-line">
+    Use for identifying underlying trends and business cycle turning points
+  </Card>
+  <Card title="Not Seasonally Adjusted" icon="calendar">
+    Use for understanding actual seasonal hiring/firing patterns
+  </Card>
+</CardGroup>
+
+### Seasonal Patterns
+
+Retail sales show strong seasonality:
+
+```javascript
+{
+  "series_id": "RSXFSN",  // NSA retail sales
+  "observation_start": "2020-01-01"
+}
+```
+
+Expected patterns:
+- **Q4 spike**: Holiday shopping season
+- **Q1 dip**: Post-holiday slowdown
+- **Summer**: Back-to-school season
+
+## Correlation Analysis
+
+### Related Series Comparison
+
+Compare inflation measures:
+
+```javascript
+// CPI
+const cpi = {
+  "series_id": "CPIAUCSL",
+  "observation_start": "2020-01-01",
+  "units": "pc1"
+};
+
+// PCE
+const pce = {
+  "series_id": "PCEPI",
+  "observation_start": "2020-01-01",
+  "units": "pc1"
+};
+```
+
+### Leading-Lagging Relationships
+
+<Steps>
+  <Step title="Identify Leading Indicator">
+    ```javascript
+    // Housing starts (leads GDP)
+    { "series_id": "HOUST" }
+    ```
+  </Step>
+
+  <Step title="Track Coincident Indicator">
+    ```javascript
+    // Industrial production
+    { "series_id": "INDPRO" }
+    ```
+  </Step>
+
+  <Step title="Monitor Lagging Indicator">
+    ```javascript
+    // Unemployment (lags recession end)
+    { "series_id": "UNRATE" }
+    ```
+  </Step>
+</Steps>
+
+### Interest Rate Relationships
+
+Yield curve analysis:
+
+```javascript
+// 10-Year Treasury
+const ten_year = {
+  "series_id": "DGS10",
+  "observation_start": "2020-01-01"
+};
+
+// 2-Year Treasury
+const two_year = {
+  "series_id": "DGS2",
+  "observation_start": "2020-01-01"
+};
+
+// Pre-calculated spread
+const spread = {
+  "series_id": "T10Y2Y",  // 10Y - 2Y spread
+  "observation_start": "2020-01-01"
+};
+```
+
+<Warning>
+  **Inverted Yield Curve** (negative spread) has historically preceded recessions
+</Warning>
+
+## Volatility Analysis
+
+### Price Volatility
+
+Measure inflation volatility:
+
+```javascript
+{
+  "series_id": "CPIAUCSL",
+  "observation_start": "2015-01-01",
+  "units": "pch"  // Month-to-month changes
+}
+```
+
+High volatility periods often indicate:
+- Economic uncertainty
+- Supply shocks
+- Policy transitions
+
+### Financial Market Volatility
+
+VIX Index (market volatility):
+
+```javascript
+{
+  "series_id": "VIXCLS",
+  "observation_start": "2020-01-01"
+}
+```
+
+## Structural Breaks
+
+### Identifying Regime Changes
+
+Look for significant structural changes:
+
+```javascript
+// Labor force participation
+{
+  "series_id": "CIVPART",
+  "observation_start": "1980-01-01"
+}
+```
+
+Notable breaks:
+- **2000**: Women's participation peak
+- **2008**: Financial crisis impact
+- **2020**: Pandemic shock
+
+### Policy Changes
+
+Federal Funds Rate regime shifts:
+
+```javascript
+{
+  "series_id": "DFF",
+  "observation_start": "2000-01-01"
+}
+```
+
+Regimes:
+- **Pre-2008**: Normal monetary policy
+- **2008-2015**: Zero lower bound
+- **2015-2019**: Gradual normalization
+- **2020-2022**: Emergency response
+- **2022-present**: Aggressive tightening
+
+## Smoothing and Filtering
+
+### Moving Averages
+
+Smooth noisy data using longer periods:
+
+```javascript
+// Weekly initial claims (volatile)
+{
+  "series_id": "ICSA",
+  "observation_start": "2020-01-01"
+}
+
+// 4-week moving average (smoother)
+{
+  "series_id": "IC4WSA",
+  "observation_start": "2020-01-01"
+}
+```
+
+### Continuous Claims vs Initial Claims
+
+<Tabs>
+  <Tab title="Initial Claims">
+    ```javascript
+    // New unemployment insurance claims
+    { "series_id": "ICSA" }
+    ```
+    More volatile, faster signal
+  </Tab>
+
+  <Tab title="Continuing Claims">
+    ```javascript
+    // Ongoing unemployment insurance
+    { "series_id": "CCSA" }
+    ```
+    Smoother, persistent signal
+  </Tab>
+</Tabs>
+
+## Growth Decomposition
+
+### GDP Components
+
+Analyze which components drive growth:
+
+```javascript
+// Total GDP
+const gdp = { "series_id": "GDP" };
+
+// Consumption (typically ~68%)
+const consumption = { "series_id": "PCEC" };
+
+// Investment (typically ~17%)
+const investment = { "series_id": "GPDI" };
+
+// Government (typically ~17%)
+const government = { "series_id": "GCE" };
+
+// Net Exports (often negative)
+const net_exports = { "series_id": "NETEXP" };
+```
+
+### Inflation Decomposition
+
+Core vs headline inflation:
+
+```javascript
+// Headline CPI
+{
+  "series_id": "CPIAUCSL",
+  "units": "pc1"
+}
+
+// Core CPI (ex food & energy)
+{
+  "series_id": "CPILFESL",
+  "units": "pc1"
+}
+
+// Food CPI
+{
+  "series_id": "CPIUFDSL",
+  "units": "pc1"
+}
+
+// Energy CPI
+{
+  "series_id": "CPIENGSL",
+  "units": "pc1"
+}
+```
+
+## Real vs Nominal
+
+### Inflation Adjustment
+
+Compare nominal and real values:
+
+```javascript
+// Nominal Wages
+{
+  "series_id": "CES0500000003",  // Avg hourly earnings
+  "observation_start": "2010-01-01"
+}
+
+// Real Wages (inflation-adjusted)
+{
+  "series_id": "CES0500000030",  // Real avg hourly earnings
+  "observation_start": "2010-01-01"
+}
+```
+
+<Tip>
+  Real values show actual purchasing power changes, while nominal values include inflation
+</Tip>
+
+## Advanced Patterns
+
+### Phillips Curve
+
+Inflation vs unemployment relationship:
+
+```javascript
+// Unemployment Rate
+const unemployment = {
+  "series_id": "UNRATE",
+  "observation_start": "2000-01-01"
+};
+
+// Core CPI Inflation
+const inflation = {
+  "series_id": "CPILFESL",
+  "observation_start": "2000-01-01",
+  "units": "pc1"
+};
+```
+
+**Expected relationship:** Higher unemployment → Lower inflation
+
+### Okun's Law
+
+GDP growth vs unemployment changes:
+
+```javascript
+// Real GDP Growth
+const gdp_growth = {
+  "series_id": "GDPC1",
+  "units": "pca"
+};
+
+// Unemployment Rate
+const unemployment = {
+  "series_id": "UNRATE"
+};
+```
+
+**Expected relationship:** 1% GDP growth above trend → ~0.5% unemployment decline
+
+## Forecasting Indicators
+
+### Nowcasting
+
+Current quarter GDP estimates:
+
+```javascript
+// GDPNow (Atlanta Fed nowcast)
+{
+  "series_id": "GDPNOW",
+  "observation_start": "2024-Q3"
+}
+```
+
+### Survey-Based Forecasts
+
+```javascript
+// Philadelphia Fed Manufacturing Index
+{
+  "series_id": "USPHCI",
+  "observation_start": "2020-01-01"
+}
+
+// Consumer Expectations
+{
+  "series_id": "UMCSENT1Y",
+  "observation_start": "2020-01-01"
+}
+```
+
+## Practical Analysis Workflows
+
+### Recession Analysis
+
+<Steps>
+  <Step title="Identify Recession Periods">
+    Use USREC to mark recessions
+  </Step>
+
+  <Step title="Track Key Indicators">
+    - Unemployment (rises during recession)
+    - GDP (declines during recession)
+    - Retail sales (weakens)
+  </Step>
+
+  <Step title="Analyze Recovery">
+    - Duration from peak to trough
+    - Time to pre-recession levels
+    - Shape of recovery (V, U, W, L)
+  </Step>
+
+  <Step title="Compare Across Recessions">
+    - 2001 (Tech bubble)
+    - 2008 (Financial crisis)
+    - 2020 (Pandemic)
+  </Step>
+</Steps>
+
+### Policy Impact Analysis
+
+Federal Reserve rate changes:
+
+```javascript
+// Fed Funds Rate
+{
+  "series_id": "DFF",
+  "observation_start": "2015-01-01"
+}
+
+// Mortgage Rates (responds to policy)
+{
+  "series_id": "MORTGAGE30US",
+  "observation_start": "2015-01-01"
+}
+
+// Housing Starts (affected by mortgage rates)
+{
+  "series_id": "HOUST",
+  "observation_start": "2015-01-01"
+}
+```
+
+## Visualization Best Practices
+
+<AccordionGroup>
+  <Accordion title="Time Period Selection">
+    - **Short-term**: 1-2 years for recent trends
+    - **Medium-term**: 5-10 years for cyclical patterns
+    - **Long-term**: 20+ years for structural changes
+  </Accordion>
+
+  <Accordion title="Frequency Matching">
+    Align frequencies when comparing:
+    - Daily: Interest rates, stock prices
+    - Monthly: Most economic indicators
+    - Quarterly: GDP and national accounts
+  </Accordion>
+
+  <Accordion title="Scale Considerations">
+    - Use same units for direct comparison
+    - Index to common base for relative comparison
+    - Use dual axes carefully (can be misleading)
+  </Accordion>
+
+  <Accordion title="Transformation Choice">
+    - **Levels**: Show absolute values
+    - **Growth rates**: Show momentum
+    - **Indexed**: Show relative performance
+    - **Normalized**: Show deviations from average
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Data Transformations"
+    icon="calculator"
+    href="/examples/data-transformations"
+  >
+    Learn transformation techniques
+  </Card>
+  <Card
+    title="Advanced Queries"
+    icon="magnifying-glass-chart"
+    href="/examples/advanced-queries"
+  >
+    Complex search patterns
+  </Card>
+  <Card
+    title="Economic Analysis"
+    icon="chart-mixed"
+    href="/use-cases/economic-analysis"
+  >
+    Comprehensive analysis workflows
+  </Card>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/fred-get-series"
+  >
+    Series retrieval documentation
+  </Card>
+</CardGroup>
