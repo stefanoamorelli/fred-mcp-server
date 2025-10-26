@@ -1,0 +1,322 @@
+---
+title: API Overview
+description: Complete reference for FRED MCP Server tools
+icon: 'code'
+---
+
+# API Reference Overview
+
+The FRED MCP Server provides three powerful tools that give you complete access to the Federal Reserve Economic Data (FRED) database containing over 800,000 economic time series.
+
+## Available Tools
+
+<CardGroup cols={3}>
+  <Card title="fred_browse" icon="folder-tree" href="/api-reference/fred-browse">
+    Navigate FRED's catalog through categories, releases, and sources
+  </Card>
+  <Card title="fred_search" icon="magnifying-glass" href="/api-reference/fred-search">
+    Search for economic data series by keywords, tags, or filters
+  </Card>
+  <Card title="fred_get_series" icon="chart-line" href="/api-reference/fred-get-series">
+    Retrieve time series data with transformations and aggregations
+  </Card>
+</CardGroup>
+
+## Tool Capabilities
+
+### Data Discovery & Navigation
+
+The **`fred_browse`** and **`fred_search`** tools work together to help you discover relevant economic data:
+
+<AccordionGroup>
+  <Accordion title="Browse by Category">
+    Navigate through hierarchical categories like:
+    - Money, Banking & Finance
+    - Population, Employment & Labor Markets
+    - Production & Business Activity
+    - International Data
+  </Accordion>
+
+  <Accordion title="Search by Keywords">
+    Find series using:
+    - Full-text search across titles and descriptions
+    - Tag-based filtering (e.g., "gdp", "monthly", "seasonally-adjusted")
+    - Combined search criteria
+  </Accordion>
+
+  <Accordion title="Filter by Attributes">
+    Narrow results by:
+    - Frequency (daily, weekly, monthly, quarterly, annual)
+    - Units (levels, percent change, index)
+    - Seasonal adjustment status
+    - Geographic region
+  </Accordion>
+</AccordionGroup>
+
+### Data Retrieval & Transformation
+
+The **`fred_get_series`** tool provides comprehensive data access:
+
+<AccordionGroup>
+  <Accordion title="Time Series Data">
+    - Historical observations dating back decades
+    - Real-time data updates
+    - Custom date ranges
+    - Vintage data for point-in-time analysis
+  </Accordion>
+
+  <Accordion title="Built-in Transformations">
+    - Growth rates and percent changes
+    - Year-over-year comparisons
+    - Logarithmic transformations
+    - Moving averages
+    - Frequency conversions
+  </Accordion>
+
+  <Accordion title="Aggregation Methods">
+    - Average over periods
+    - Sum of values
+    - End-of-period observations
+    - Custom sampling frequencies
+  </Accordion>
+</AccordionGroup>
+
+## Response Formats
+
+All tools return structured JSON responses:
+
+### Success Response Structure
+
+```json
+{
+  "type": "text",
+  "text": "Successfully retrieved data",
+  "data": {
+    // Tool-specific data structure
+  },
+  "metadata": {
+    "count": 100,
+    "offset": 0,
+    "limit": 100,
+    "total": 500
+  }
+}
+```
+
+### Error Response Structure
+
+```json
+{
+  "type": "text",
+  "text": "Error message describing the issue",
+  "error": {
+    "code": "INVALID_SERIES_ID",
+    "message": "The series ID 'INVALID' was not found",
+    "details": {
+      // Additional error context
+    }
+  }
+}
+```
+
+## Common Parameters
+
+Many parameters are shared across tools:
+
+<ParamField path="limit" type="number" default="25">
+  Maximum number of results to return. Range varies by tool:
+  - Search: 1-1000
+  - Browse: 1-1000
+  - Series: 1-100000
+</ParamField>
+
+<ParamField path="offset" type="number" default="0">
+  Number of results to skip for pagination. Useful for retrieving large result sets.
+</ParamField>
+
+<ParamField path="sort_order" type="string" default="asc">
+  Sort order for results:
+  - `asc`: Ascending order
+  - `desc`: Descending order
+</ParamField>
+
+<ParamField path="order_by" type="string">
+  Field to sort results by. Options vary by tool but commonly include:
+  - `series_id`: Alphabetical by ID
+  - `title`: Alphabetical by title
+  - `popularity`: Most frequently accessed
+  - `last_updated`: Most recently updated
+</ParamField>
+
+## Rate Limits
+
+<Warning>
+  FRED API has rate limits to ensure fair usage:
+  - **120 requests per minute** for general API calls
+  - **40 requests per minute** for series observations
+</Warning>
+
+The server automatically handles rate limiting with:
+- Exponential backoff on rate limit errors
+- Request queuing
+- Automatic retries with jitter
+
+## Data Freshness
+
+<Info>
+  Data update frequency varies by series:
+  - **Real-time series**: Updated within minutes of release
+  - **Daily series**: Updated each business day
+  - **Weekly/Monthly**: Updated per release schedule
+  - **Quarterly/Annual**: Updated per official release calendar
+</Info>
+
+## Error Handling
+
+Common error codes and their meanings:
+
+| Error Code | Description | Solution |
+|------------|-------------|----------|
+| `INVALID_API_KEY` | API key is invalid or missing | Check your FRED API key configuration |
+| `SERIES_NOT_FOUND` | Requested series ID doesn't exist | Verify the series ID or search for alternatives |
+| `RATE_LIMIT_EXCEEDED` | Too many requests | Wait and retry, or reduce request frequency |
+| `INVALID_DATE_RANGE` | Date parameters are invalid | Use YYYY-MM-DD format and ensure start < end |
+| `TRANSFORMATION_ERROR` | Cannot apply requested transformation | Check if transformation is valid for the series |
+
+## Best Practices
+
+<Steps>
+  <Step title="Start with Search or Browse">
+    Don't guess series IDs. Use `fred_search` or `fred_browse` to discover available data.
+  </Step>
+
+  <Step title="Use Appropriate Limits">
+    Start with smaller limits and increase as needed. Large requests may timeout.
+  </Step>
+
+  <Step title="Respect Rate Limits">
+    Plan queries carefully and respect FRED API rate limits. Review FRED's terms of use.
+  </Step>
+
+  <Step title="Handle Errors Gracefully">
+    Always check for error responses and have fallback strategies.
+  </Step>
+</Steps>
+
+## Tool Comparison
+
+| Feature | fred_browse | fred_search | fred_get_series |
+|---------|------------|-------------|-----------------|
+| **Purpose** | Navigate catalog | Find specific series | Retrieve data |
+| **Input** | Category/Release IDs | Keywords/Tags | Series ID |
+| **Output** | Lists of categories/series | Matching series | Time series data |
+| **Best For** | Exploring available data | Finding known indicators | Getting actual values |
+| **Pagination** | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Filtering** | Basic | Advanced | N/A |
+| **Transformations** | ❌ No | ❌ No | ✅ Yes |
+
+## Integration Examples
+
+<CodeGroup>
+```javascript JavaScript/Node.js
+// Using with an MCP client
+const client = new MCPClient();
+
+// Browse categories
+const categories = await client.callTool('fred_browse', {
+  browse_type: 'categories'
+});
+
+// Search for inflation
+const results = await client.callTool('fred_search', {
+  search_text: 'inflation',
+  tag_names: 'monthly,sa'
+});
+
+// Get CPI data
+const cpi = await client.callTool('fred_get_series', {
+  series_id: 'CPIAUCSL',
+  units: 'pc1'  // Year-over-year % change
+});
+```
+
+```python Python
+# Using with Python MCP client
+import mcp_client
+
+client = mcp_client.Client()
+
+# Browse economic releases
+releases = client.call_tool('fred_browse', {
+    'browse_type': 'releases',
+    'limit': 10
+})
+
+# Search for employment data
+employment = client.call_tool('fred_search', {
+    'search_text': 'employment',
+    'filter_variable': 'frequency',
+    'filter_value': 'm'  # Monthly only
+})
+
+# Get unemployment rate
+unemployment = client.call_tool('fred_get_series', {
+    'series_id': 'UNRATE',
+    'observation_start': '2024-01-01'
+})
+```
+
+```bash Command Line
+# Using with curl and jq
+
+# Browse sources
+curl -X POST http://localhost:3000/tool/call \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool": "fred_browse",
+    "params": {"browse_type": "sources"}
+  }' | jq .
+
+# Search for GDP
+curl -X POST http://localhost:3000/tool/call \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool": "fred_search",
+    "params": {"search_text": "gross domestic product"}
+  }' | jq .
+
+# Get GDP data
+curl -X POST http://localhost:3000/tool/call \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool": "fred_get_series",
+    "params": {"series_id": "GDP"}
+  }' | jq .
+```
+</CodeGroup>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card
+    title="fred_browse"
+    icon="folder-tree"
+    href="/api-reference/fred-browse"
+  >
+    Browse tool reference
+  </Card>
+  <Card
+    title="fred_search"
+    icon="magnifying-glass"
+    href="/api-reference/fred-search"
+  >
+    Search tool reference
+  </Card>
+  <Card
+    title="fred_get_series"
+    icon="chart-line"
+    href="/api-reference/fred-get-series"
+  >
+    Series tool reference
+  </Card>
+</CardGroup>

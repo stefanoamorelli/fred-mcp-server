@@ -1,0 +1,604 @@
+---
+title: fred_get_series
+description: Retrieve time series data with transformations and aggregations
+icon: 'chart-line'
+---
+
+# fred_get_series
+
+Retrieve any FRED time series data by ID with support for data transformations, frequency changes, and custom date ranges.
+
+## Overview
+
+The `fred_get_series` tool is your primary interface for accessing actual economic data. It supports:
+
+- Retrieving observations for any of the 800,000+ series
+- Applying mathematical transformations (growth rates, percent changes)
+- Converting between frequencies (daily to monthly, monthly to quarterly)
+- Custom date ranges and vintage data
+- Multiple aggregation methods
+
+## Parameters
+
+<ParamField path="series_id" type="string" required>
+  The FRED series ID to retrieve data for.
+
+  **Popular IDs:**
+  - `GDP`: Gross Domestic Product
+  - `UNRATE`: Unemployment Rate
+  - `CPIAUCSL`: Consumer Price Index
+  - `DFF`: Federal Funds Rate
+  - `SP500`: S&P 500 Index
+
+  **Finding IDs:**
+  Use `fred_search` or `fred_browse` to discover series IDs
+</ParamField>
+
+<ParamField path="observation_start" type="string">
+  Start date for observations in YYYY-MM-DD format.
+
+  **Examples:**
+  - `2024-01-01`: Start of 2024
+  - `2020-03-01`: Beginning of pandemic period
+  - `2008-09-01`: Start of financial crisis
+
+  **Default:** Series start date
+</ParamField>
+
+<ParamField path="observation_end" type="string">
+  End date for observations in YYYY-MM-DD format.
+
+  **Examples:**
+  - `2024-12-31`: End of 2024
+  - `2023-12-31`: Full year 2023
+
+  **Default:** Most recent available data
+</ParamField>
+
+<ParamField path="limit" type="number" default="100000">
+  Maximum number of observations to return (1-100000).
+
+  **Usage:**
+  - Small limits for recent data: `12` for last year of monthly data
+  - Large limits for historical analysis
+</ParamField>
+
+<ParamField path="offset" type="number" default="0">
+  Number of observations to skip from the beginning.
+</ParamField>
+
+<ParamField path="sort_order" type="string" default="asc">
+  Sort order of observations by date.
+
+  **Options:**
+  - `asc`: Chronological order (oldest first)
+  - `desc`: Reverse chronological (newest first)
+</ParamField>
+
+<ParamField path="units" type="string" default="lin">
+  Data transformation to apply.
+
+  **Options:**
+  - `lin`: Levels (no transformation) - raw values
+  - `chg`: Change from previous period
+  - `ch1`: Change from year ago
+  - `pch`: Percent change from previous period
+  - `pc1`: Percent change from year ago
+  - `pca`: Compounded annual rate of change
+  - `cch`: Continuously compounded rate of change
+  - `cca`: Continuously compounded annual rate
+  - `log`: Natural logarithm
+
+  **Common uses:**
+  - `pc1` for year-over-year inflation
+  - `pch` for month-over-month growth
+  - `log` for regression analysis
+</ParamField>
+
+<ParamField path="frequency" type="string">
+  Frequency aggregation/conversion.
+
+  **Main options:**
+  - `d`: Daily
+  - `w`: Weekly
+  - `bw`: Biweekly
+  - `m`: Monthly
+  - `q`: Quarterly
+  - `sa`: Semiannual
+  - `a`: Annual
+
+  **Weekly variants:**
+  - `wef`: Week Ending Friday
+  - `weth`: Week Ending Thursday
+  - `wew`: Week Ending Wednesday
+  - `wetu`: Week Ending Tuesday
+  - `wem`: Week Ending Monday
+  - `wesu`: Week Ending Sunday
+  - `wesa`: Week Ending Saturday
+
+  **Default:** Native series frequency
+</ParamField>
+
+<ParamField path="aggregation_method" type="string" default="avg">
+  Method for aggregating to lower frequencies.
+
+  **Options:**
+  - `avg`: Average over period
+  - `sum`: Sum of values in period
+  - `eop`: End of period value
+
+  **Usage examples:**
+  - `avg` for interest rates, prices
+  - `sum` for flows like GDP, sales
+  - `eop` for stock prices, levels
+</ParamField>
+
+<ParamField path="output_type" type="number" default="1">
+  Output format type.
+
+  **Options:**
+  - `1`: Time series observations
+  - `2`: Observations by vintage date
+  - `3`: Observations by release date
+  - `4`: Initial release only
+
+  **Note:** Types 2-4 for vintage analysis
+</ParamField>
+
+<ParamField path="vintage_dates" type="string">
+  Specific vintage date(s) in YYYY-MM-DD format.
+
+  **Usage:**
+  - Single date: `2024-01-01`
+  - Date range: `2024-01-01:2024-12-31`
+
+  **Purpose:** Retrieve data as it existed on specific dates
+</ParamField>
+
+## Examples
+
+### Basic Series Retrieval
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "UNRATE",
+    "limit": 12
+  }
+}
+```
+
+```json Response
+{
+  "series": {
+    "id": "UNRATE",
+    "title": "Unemployment Rate",
+    "units": "Percent",
+    "frequency": "Monthly",
+    "seasonal_adjustment": "Seasonally Adjusted"
+  },
+  "observations": [
+    {"date": "2024-01-01", "value": 3.7},
+    {"date": "2024-02-01", "value": 3.9},
+    {"date": "2024-03-01", "value": 3.8},
+    {"date": "2024-04-01", "value": 3.9},
+    {"date": "2024-05-01", "value": 4.0},
+    {"date": "2024-06-01", "value": 4.0},
+    {"date": "2024-07-01", "value": 4.3},
+    {"date": "2024-08-01", "value": 4.2},
+    {"date": "2024-09-01", "value": 4.1},
+    {"date": "2024-10-01", "value": 4.1},
+    {"date": "2024-11-01", "value": 4.2},
+    {"date": "2024-12-01", "value": 4.2}
+  ],
+  "metadata": {
+    "count": 12,
+    "observation_start": "2024-01-01",
+    "observation_end": "2024-12-01"
+  }
+}
+```
+</CodeGroup>
+
+### Year-over-Year Inflation
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "CPIAUCSL",
+    "units": "pc1",
+    "observation_start": "2024-01-01",
+    "limit": 12
+  }
+}
+```
+
+```json Response
+{
+  "series": {
+    "id": "CPIAUCSL",
+    "title": "Consumer Price Index for All Urban Consumers",
+    "units": "Percent Change from Year Ago",
+    "transformation": "pc1"
+  },
+  "observations": [
+    {"date": "2024-01-01", "value": 3.1},
+    {"date": "2024-02-01", "value": 3.2},
+    {"date": "2024-03-01", "value": 3.5},
+    {"date": "2024-04-01", "value": 3.4},
+    {"date": "2024-05-01", "value": 3.3},
+    {"date": "2024-06-01", "value": 3.0},
+    {"date": "2024-07-01", "value": 2.9},
+    {"date": "2024-08-01", "value": 2.5},
+    {"date": "2024-09-01", "value": 2.4},
+    {"date": "2024-10-01", "value": 2.6},
+    {"date": "2024-11-01", "value": 2.7},
+    {"date": "2024-12-01", "value": 2.9}
+  ]
+}
+```
+</CodeGroup>
+
+### Quarterly GDP Growth
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "GDPC1",
+    "units": "pca",
+    "observation_start": "2023-01-01",
+    "observation_end": "2024-12-31"
+  }
+}
+```
+
+```json Response
+{
+  "series": {
+    "id": "GDPC1",
+    "title": "Real Gross Domestic Product",
+    "units": "Compounded Annual Rate of Change",
+    "frequency": "Quarterly"
+  },
+  "observations": [
+    {"date": "2023-01-01", "value": 2.2},
+    {"date": "2023-04-01", "value": 2.1},
+    {"date": "2023-07-01", "value": 4.9},
+    {"date": "2023-10-01", "value": 3.4},
+    {"date": "2024-01-01", "value": 1.6},
+    {"date": "2024-04-01", "value": 3.0},
+    {"date": "2024-07-01", "value": 2.8},
+    {"date": "2024-10-01", "value": 2.5}
+  ]
+}
+```
+</CodeGroup>
+
+### Convert Daily to Monthly
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "DFF",
+    "frequency": "m",
+    "aggregation_method": "avg",
+    "observation_start": "2024-01-01",
+    "limit": 12
+  }
+}
+```
+
+```json Response
+{
+  "series": {
+    "id": "DFF",
+    "title": "Federal Funds Effective Rate",
+    "original_frequency": "Daily",
+    "requested_frequency": "Monthly",
+    "aggregation": "Average"
+  },
+  "observations": [
+    {"date": "2024-01-01", "value": 5.33},
+    {"date": "2024-02-01", "value": 5.33},
+    {"date": "2024-03-01", "value": 5.33},
+    {"date": "2024-04-01", "value": 5.33},
+    {"date": "2024-05-01", "value": 5.33},
+    {"date": "2024-06-01", "value": 5.33},
+    {"date": "2024-07-01", "value": 5.33},
+    {"date": "2024-08-01", "value": 5.33},
+    {"date": "2024-09-01", "value": 5.08},
+    {"date": "2024-10-01", "value": 4.83},
+    {"date": "2024-11-01", "value": 4.58},
+    {"date": "2024-12-01", "value": 4.33}
+  ]
+}
+```
+</CodeGroup>
+
+## Common Use Cases
+
+### Economic Dashboard
+
+```json
+// GDP Growth (Quarterly)
+{
+  "series_id": "GDPC1",
+  "units": "pca",
+  "limit": 8
+}
+
+// Unemployment Rate (Monthly)
+{
+  "series_id": "UNRATE",
+  "limit": 24
+}
+
+// Inflation Rate (Monthly YoY)
+{
+  "series_id": "CPIAUCSL",
+  "units": "pc1",
+  "limit": 24
+}
+
+// Federal Funds Rate (Daily)
+{
+  "series_id": "DFF",
+  "limit": 30
+}
+```
+
+### Historical Analysis
+
+```json
+// Long-term GDP growth
+{
+  "series_id": "GDPC1",
+  "units": "pc1",
+  "observation_start": "1950-01-01",
+  "frequency": "a"
+}
+
+// Unemployment during recessions
+{
+  "series_id": "UNRATE",
+  "observation_start": "2007-01-01",
+  "observation_end": "2010-12-31"
+}
+
+// Inflation in the 1970s
+{
+  "series_id": "CPIAUCSL",
+  "units": "pc1",
+  "observation_start": "1970-01-01",
+  "observation_end": "1979-12-31"
+}
+```
+
+### Financial Market Indicators
+
+```json
+// 10-Year Treasury Yield
+{
+  "series_id": "DGS10",
+  "limit": 252  // ~1 year of trading days
+}
+
+// Yield Curve (10Y-2Y Spread)
+// Requires two calls and calculation
+{
+  "series_id": "T10Y2Y",
+  "limit": 252
+}
+
+// S&P 500 Monthly Returns
+{
+  "series_id": "SP500",
+  "units": "pch",
+  "frequency": "m",
+  "aggregation_method": "eop"
+}
+```
+
+## Transformation Examples
+
+### Growth Rate Calculations
+
+<Tabs>
+  <Tab title="Month-over-Month">
+    ```json
+    {
+      "series_id": "PAYEMS",
+      "units": "chg",
+      "limit": 12
+    }
+    ```
+    Returns absolute change from previous month
+  </Tab>
+
+  <Tab title="Quarter-over-Quarter">
+    ```json
+    {
+      "series_id": "GDPC1",
+      "units": "pch",
+      "limit": 8
+    }
+    ```
+    Returns percent change from previous quarter
+  </Tab>
+
+  <Tab title="Year-over-Year">
+    ```json
+    {
+      "series_id": "CPIAUCSL",
+      "units": "pc1",
+      "limit": 24
+    }
+    ```
+    Returns percent change from same period last year
+  </Tab>
+
+  <Tab title="Annualized Rate">
+    ```json
+    {
+      "series_id": "GDPC1",
+      "units": "pca",
+      "limit": 8
+    }
+    ```
+    Returns compounded annual rate of change
+  </Tab>
+</Tabs>
+
+### Frequency Conversions
+
+<Tabs>
+  <Tab title="Daily to Monthly">
+    ```json
+    {
+      "series_id": "DFF",
+      "frequency": "m",
+      "aggregation_method": "avg"
+    }
+    ```
+    Average daily values into monthly
+  </Tab>
+
+  <Tab title="Monthly to Quarterly">
+    ```json
+    {
+      "series_id": "CPIAUCSL",
+      "frequency": "q",
+      "aggregation_method": "avg"
+    }
+    ```
+    Average monthly values into quarterly
+  </Tab>
+
+  <Tab title="Monthly to Annual">
+    ```json
+    {
+      "series_id": "UNRATE",
+      "frequency": "a",
+      "aggregation_method": "avg"
+    }
+    ```
+    Average monthly values into annual
+  </Tab>
+
+  <Tab title="Daily to Weekly">
+    ```json
+    {
+      "series_id": "DEXUSEU",
+      "frequency": "wef",
+      "aggregation_method": "eop"
+    }
+    ```
+    Week-ending Friday values
+  </Tab>
+</Tabs>
+
+## Popular Series Reference
+
+### Key Economic Indicators
+
+| Series ID | Description | Frequency | Common Transform |
+|-----------|-------------|-----------|------------------|
+| GDP | Nominal GDP | Quarterly | `units: "pch"` |
+| GDPC1 | Real GDP | Quarterly | `units: "pca"` |
+| UNRATE | Unemployment Rate | Monthly | None (already %) |
+| PAYEMS | Nonfarm Payrolls | Monthly | `units: "chg"` |
+| CPIAUCSL | CPI All Urban | Monthly | `units: "pc1"` |
+| CPILFESL | Core CPI | Monthly | `units: "pc1"` |
+| PCEPI | PCE Price Index | Monthly | `units: "pc1"` |
+
+### Interest Rates
+
+| Series ID | Description | Frequency | Notes |
+|-----------|-------------|-----------|-------|
+| DFF | Fed Funds Effective | Daily | Current policy rate |
+| DGS10 | 10-Year Treasury | Daily | Long-term rate |
+| DGS2 | 2-Year Treasury | Daily | Short-term rate |
+| TB3MS | 3-Month T-Bill | Monthly | Risk-free rate |
+| MORTGAGE30US | 30-Year Mortgage | Weekly | Consumer rate |
+
+### Market Indicators
+
+| Series ID | Description | Frequency | Transform for Returns |
+|-----------|-------------|-----------|----------------------|
+| SP500 | S&P 500 Index | Daily | `units: "pch"` |
+| DJIA | Dow Jones | Daily | `units: "pch"` |
+| NASDAQCOM | NASDAQ Composite | Daily | `units: "pch"` |
+| VIXCLS | VIX Volatility | Daily | None |
+| DEXUSEU | EUR/USD Exchange | Daily | `units: "pch"` |
+
+## Error Handling
+
+### Common Errors
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `Invalid series ID` | Series doesn't exist | Use fred_search to find correct ID |
+| `No data in range` | Date range has no data | Check series start/end dates |
+| `Invalid transformation` | Transform not applicable | Some transforms need positive values |
+| `Frequency conversion error` | Can't convert to requested frequency | Check if conversion makes sense |
+
+### Validation Rules
+
+<Warning>
+  **Important constraints:**
+  - Dates must be in YYYY-MM-DD format
+  - observation_start must be ≤ observation_end
+  - Some transformations require positive values
+  - Not all frequency conversions are valid
+</Warning>
+
+## Best Practices
+
+<Steps>
+  <Step title="Know Your Data">
+    Check series metadata (frequency, units, seasonal adjustment) before retrieval
+  </Step>
+
+  <Step title="Use Appropriate Transforms">
+    Match transformation to analysis needs (growth rates for trends, logs for regression)
+  </Step>
+
+  <Step title="Consider Frequency">
+    Align data frequencies when comparing multiple series
+  </Step>
+
+  <Step title="Handle Missing Data">
+    Some series have gaps; check for null values in observations
+  </Step>
+
+  <Step title="Plan Queries Carefully">
+    Think through data needs to minimize redundant requests
+  </Step>
+</Steps>
+
+## Related Tools
+
+<CardGroup cols={2}>
+  <Card
+    title="fred_search"
+    icon="magnifying-glass"
+    href="/api-reference/fred-search"
+  >
+    Find series IDs to retrieve
+  </Card>
+  <Card
+    title="fred_browse"
+    icon="folder-tree"
+    href="/api-reference/fred-browse"
+  >
+    Explore available categories
+  </Card>
+</CardGroup>
