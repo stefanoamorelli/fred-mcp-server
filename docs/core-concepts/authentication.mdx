@@ -1,0 +1,404 @@
+---
+title: Authentication
+description: Setting up FRED API access and security
+icon: 'key'
+---
+
+# Authentication
+
+Access to the FRED API requires a free API key. This guide covers how to obtain and configure your API key securely.
+
+## Getting an API Key
+
+### Registration Process
+
+<Steps>
+  <Step title="Create Account">
+    Visit [FRED API Registration](https://fredaccount.stlouisfed.org/apikeys) and create a free account
+  </Step>
+
+  <Step title="Request API Key">
+    Click "Request API Key" and fill out the brief application form
+  </Step>
+
+  <Step title="Instant Approval">
+    Your API key will be generated immediately and displayed on screen
+  </Step>
+
+  <Step title="Save Securely">
+    Store your key securely - you'll need it for configuration
+  </Step>
+</Steps>
+
+<Note>
+  API keys are **completely free** with no usage fees. Rate limits apply but are generous for most use cases.
+</Note>
+
+### API Key Format
+
+Keys are 32-character alphanumeric strings:
+```
+a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+```
+
+## Configuration
+
+### Environment Variables (Recommended)
+
+The most secure method is using environment variables.
+
+<Tabs>
+  <Tab title="Claude Desktop (macOS)">
+    Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "fred": {
+          "command": "npx",
+          "args": ["-y", "fred-mcp-server"],
+          "env": {
+            "FRED_API_KEY": "your-api-key-here"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Claude Desktop (Windows)">
+    Edit `%APPDATA%\Claude\claude_desktop_config.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "fred": {
+          "command": "npx",
+          "args": ["-y", "fred-mcp-server"],
+          "env": {
+            "FRED_API_KEY": "your-api-key-here"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="System Environment">
+    Add to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.):
+
+    ```bash
+    export FRED_API_KEY="your-api-key-here"
+    ```
+
+    Then restart your terminal or run:
+    ```bash
+    source ~/.bashrc  # or ~/.zshrc
+    ```
+  </Tab>
+
+  <Tab title=".env File">
+    Create `.env` file in your project directory:
+
+    ```bash
+    FRED_API_KEY=your-api-key-here
+    ```
+
+    <Warning>
+      Add `.env` to `.gitignore` to prevent committing secrets
+    </Warning>
+  </Tab>
+</Tabs>
+
+### Verification
+
+Test your configuration:
+
+```bash
+# Using the MCP server directly
+FRED_API_KEY=your-key npx fred-mcp-server
+
+# Or if set in environment
+npx fred-mcp-server
+```
+
+The server should start without errors. If you see authentication errors, verify your key is correct.
+
+## Security Best Practices
+
+### Key Protection
+
+<AccordionGroup>
+  <Accordion title="Never Commit Keys">
+    ❌ Don't:
+    ```json
+    // config.json
+    {
+      "api_key": "a1b2c3d4e5f6g7h8..."
+    }
+    ```
+
+    ✅ Do:
+    ```json
+    // config.json (use environment variables)
+    {
+      "api_key": "${FRED_API_KEY}"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Restrict File Permissions">
+    Limit who can read configuration files:
+    ```bash
+    chmod 600 ~/.claude/config.json
+    chmod 600 .env
+    ```
+  </Accordion>
+
+  <Accordion title="Use Separate Keys">
+    Create different keys for:
+    - Development environments
+    - Production systems
+    - Different applications
+
+    This allows selective revocation if needed.
+  </Accordion>
+
+  <Accordion title="Regular Rotation">
+    Periodically generate new keys and update your configuration
+  </Accordion>
+</AccordionGroup>
+
+### Access Control
+
+The FRED MCP Server never:
+- Logs API keys
+- Exposes keys in responses
+- Stores keys persistently
+- Transmits keys except to FRED API
+
+Keys are only used for authenticated requests to `api.stlouisfed.org`.
+
+## Rate Limits
+
+FRED API implements rate limiting to ensure fair usage.
+
+### Current Limits
+
+| Limit Type | Restriction | Notes |
+|------------|-------------|-------|
+| Requests per Minute | 120 | Across all endpoints |
+| Series Observations | 40/min | Specific to data retrieval |
+| Daily Requests | Varies | Based on account tier |
+
+### Handling Rate Limits
+
+The MCP server implements automatic handling:
+
+<CodeGroup>
+```javascript Retry Logic
+{
+  maxRetries: 3,
+  backoffMultiplier: 2,
+  initialDelay: 1000 // ms
+}
+```
+
+```javascript Rate Limit Response
+{
+  "error": {
+    "code": 429,
+    "message": "Too Many Requests",
+    "retryAfter": 60 // seconds
+  }
+}
+```
+</CodeGroup>
+
+### Best Practices
+
+<Steps>
+  <Step title="Batch Requests">
+    Group related queries to minimize API calls
+  </Step>
+
+  <Step title="Use Date Ranges">
+    Request only the time periods you need
+  </Step>
+
+  <Step title="Avoid Unnecessary Requests">
+    Plan queries carefully to minimize redundant API calls
+  </Step>
+
+  <Step title="Off-Peak Usage">
+    Schedule heavy queries during off-peak hours
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Authentication Failed (401)">
+    **Symptoms:** "Bad Request. The value for variable api_key is not registered."
+
+    **Solutions:**
+    - Verify API key is correct (check for typos)
+    - Ensure environment variable is set
+    - Restart the MCP server after changing config
+    - Check key hasn't been revoked
+  </Accordion>
+
+  <Accordion title="Rate Limited (429)">
+    **Symptoms:** "Too many requests"
+
+    **Solutions:**
+    - Wait 60 seconds before retrying
+    - Reduce request frequency
+    - Use date ranges to limit data size
+    - Use fewer concurrent requests
+  </Accordion>
+
+  <Accordion title="Environment Variable Not Found">
+    **Symptoms:** Server starts but requests fail
+
+    **Solutions:**
+    - Check variable name is exactly `FRED_API_KEY`
+    - Verify it's set in the correct profile file
+    - Restart terminal/application after setting
+    - Use absolute paths in configuration
+  </Accordion>
+
+  <Accordion title="Invalid Response Format">
+    **Symptoms:** JSON parsing errors
+
+    **Solutions:**
+    - Verify API key format (32 hex characters)
+    - Check for special characters in key
+    - Ensure no whitespace in environment variable
+  </Accordion>
+</AccordionGroup>
+
+### Debug Mode
+
+Enable detailed logging:
+
+```bash
+DEBUG=fred:* npx fred-mcp-server
+```
+
+This shows:
+- Request URLs (with key redacted)
+- Response status codes
+- Rate limit status
+- Error details
+
+## Key Management
+
+### Regenerating Keys
+
+If your key is compromised:
+
+<Steps>
+  <Step title="Login to FRED Account">
+    Visit your [API Keys page](https://fredaccount.stlouisfed.org/apikeys)
+  </Step>
+
+  <Step title="Revoke Old Key">
+    Click "Delete" next to the compromised key
+  </Step>
+
+  <Step title="Generate New Key">
+    Click "Request API Key" to create a replacement
+  </Step>
+
+  <Step title="Update Configuration">
+    Replace the old key in all your configurations
+  </Step>
+
+  <Step title="Restart Services">
+    Restart MCP server and any dependent applications
+  </Step>
+</Steps>
+
+### Multiple Keys
+
+You can have multiple API keys:
+
+```json
+{
+  "mcpServers": {
+    "fred-dev": {
+      "command": "npx",
+      "args": ["-y", "fred-mcp-server"],
+      "env": {
+        "FRED_API_KEY": "development-key"
+      }
+    },
+    "fred-prod": {
+      "command": "npx",
+      "args": ["-y", "fred-mcp-server"],
+      "env": {
+        "FRED_API_KEY": "production-key"
+      }
+    }
+  }
+}
+```
+
+## Terms of Use
+
+By using the FRED API, you agree to:
+
+<CardGroup cols={2}>
+  <Card title="Attribution" icon="quote-left">
+    Credit Federal Reserve Bank of St. Louis and FRED
+  </Card>
+  <Card title="Non-Commercial" icon="hand-holding-dollar">
+    Free for research, education, and personal use
+  </Card>
+  <Card title="No Resale" icon="ban">
+    Don't redistribute raw data commercially
+  </Card>
+  <Card title="Respect Limits" icon="gauge-high">
+    Adhere to rate limits and usage guidelines
+  </Card>
+</CardGroup>
+
+<Info>
+  For commercial use or higher limits, contact the [FRED team](mailto:stlsFRED@stls.frb.org) directly.
+</Info>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Quickstart"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Start using the MCP server
+  </Card>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/overview"
+  >
+    Explore available tools
+  </Card>
+  <Card
+    title="Examples"
+    icon="code"
+    href="/examples/basic-usage"
+  >
+    See usage examples
+  </Card>
+  <Card
+    title="Troubleshooting"
+    icon="wrench"
+    href="/resources/troubleshooting"
+  >
+    Get help with issues
+  </Card>
+</CardGroup>
