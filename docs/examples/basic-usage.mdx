@@ -1,0 +1,711 @@
+---
+title: Basic Usage
+description: Getting started with common FRED MCP Server queries
+icon: 'play'
+---
+
+# Basic Usage Examples
+
+Learn how to use the FRED MCP Server with practical examples covering the most common economic data queries.
+
+## Getting Started
+
+Before diving into examples, ensure you have:
+1. Configured your FRED API key
+2. Connected the server to your MCP client
+3. Verified the connection is working
+
+## Common Economic Queries
+
+### Unemployment Rate
+
+<Tabs>
+  <Tab title="Current Rate">
+    **Query:** "What's the current US unemployment rate?"
+
+    ```json
+    {
+      "tool": "fred_get_series",
+      "params": {
+        "series_id": "UNRATE",
+        "limit": 1,
+        "sort_order": "desc"
+      }
+    }
+    ```
+
+    **Response:** Latest unemployment rate value
+  </Tab>
+
+  <Tab title="Last Year">
+    **Query:** "Show unemployment rate for the last 12 months"
+
+    ```json
+    {
+      "tool": "fred_get_series",
+      "params": {
+        "series_id": "UNRATE",
+        "limit": 12,
+        "sort_order": "desc"
+      }
+    }
+    ```
+
+    **Response:** Monthly unemployment values
+  </Tab>
+
+  <Tab title="Historical Trend">
+    **Query:** "Get unemployment trend since 2020"
+
+    ```json
+    {
+      "tool": "fred_get_series",
+      "params": {
+        "series_id": "UNRATE",
+        "observation_start": "2020-01-01"
+      }
+    }
+    ```
+
+    **Response:** Full pandemic-era unemployment data
+  </Tab>
+</Tabs>
+
+### Inflation Tracking
+
+<Tabs>
+  <Tab title="Current Inflation">
+    **Query:** "What's the current inflation rate?"
+
+    ```json
+    {
+      "tool": "fred_get_series",
+      "params": {
+        "series_id": "CPIAUCSL",
+        "units": "pc1",
+        "limit": 1,
+        "sort_order": "desc"
+      }
+    }
+    ```
+
+    **Response:** Year-over-year CPI change
+  </Tab>
+
+  <Tab title="Core vs Headline">
+    **Query:** "Compare core and headline inflation"
+
+    ```json
+    // Headline CPI
+    {
+      "tool": "fred_get_series",
+      "params": {
+        "series_id": "CPIAUCSL",
+        "units": "pc1",
+        "limit": 12
+      }
+    }
+
+    // Core CPI
+    {
+      "tool": "fred_get_series",
+      "params": {
+        "series_id": "CPILFESL",
+        "units": "pc1",
+        "limit": 12
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Monthly Changes">
+    **Query:** "Show month-to-month inflation changes"
+
+    ```json
+    {
+      "tool": "fred_get_series",
+      "params": {
+        "series_id": "CPIAUCSL",
+        "units": "pch",
+        "limit": 12
+      }
+    }
+    ```
+
+    **Response:** Monthly percent changes
+  </Tab>
+</Tabs>
+
+### GDP and Growth
+
+<Tabs>
+  <Tab title="Latest GDP">
+    **Query:** "What's the latest GDP figure?"
+
+    ```json
+    {
+      "tool": "fred_get_series",
+      "params": {
+        "series_id": "GDP",
+        "limit": 1,
+        "sort_order": "desc"
+      }
+    }
+    ```
+
+    **Response:** Nominal GDP in billions
+  </Tab>
+
+  <Tab title="Real GDP Growth">
+    **Query:** "Show real GDP growth rate"
+
+    ```json
+    {
+      "tool": "fred_get_series",
+      "params": {
+        "series_id": "GDPC1",
+        "units": "pca",
+        "limit": 8
+      }
+    }
+    ```
+
+    **Response:** Annualized growth rates
+  </Tab>
+
+  <Tab title="GDP Components">
+    **Query:** "Break down GDP by components"
+
+    ```json
+    // Personal Consumption
+    {
+      "series_id": "PCE",
+      "limit": 4
+    }
+
+    // Investment
+    {
+      "series_id": "GPDI",
+      "limit": 4
+    }
+
+    // Government
+    {
+      "series_id": "GCE",
+      "limit": 4
+    }
+
+    // Net Exports
+    {
+      "series_id": "NETEXP",
+      "limit": 4
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Interest Rates
+
+### Federal Reserve Rates
+
+<CodeGroup>
+```json Federal Funds Rate
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "DFF",
+    "limit": 30
+  }
+}
+```
+
+```json Target Rate Range
+// Upper bound
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "DFEDTARU",
+    "limit": 12
+  }
+}
+
+// Lower bound
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "DFEDTARL",
+    "limit": 12
+  }
+}
+```
+
+```json Real Interest Rate
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "REAINTRATREARAT10Y",
+    "limit": 12
+  }
+}
+```
+</CodeGroup>
+
+### Treasury Yields
+
+<CodeGroup>
+```json Yield Curve
+// 3-Month
+{"series_id": "DGS3MO", "limit": 1}
+
+// 2-Year
+{"series_id": "DGS2", "limit": 1}
+
+// 5-Year
+{"series_id": "DGS5", "limit": 1}
+
+// 10-Year
+{"series_id": "DGS10", "limit": 1}
+
+// 30-Year
+{"series_id": "DGS30", "limit": 1}
+```
+
+```json Yield Spread
+// 10Y-2Y Spread (Recession Indicator)
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "T10Y2Y",
+    "limit": 252
+  }
+}
+```
+</CodeGroup>
+
+## Labor Market Data
+
+### Employment Statistics
+
+<CodeGroup>
+```json Nonfarm Payrolls
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "PAYEMS",
+    "units": "chg",
+    "limit": 12
+  }
+}
+```
+
+```json Labor Force Participation
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "CIVPART",
+    "limit": 24
+  }
+}
+```
+
+```json Average Hourly Earnings
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "CES0500000003",
+    "units": "pc1",
+    "limit": 12
+  }
+}
+```
+</CodeGroup>
+
+### Jobless Claims
+
+<CodeGroup>
+```json Initial Claims
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "ICSA",
+    "limit": 52
+  }
+}
+```
+
+```json Continuing Claims
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "CCSA",
+    "limit": 52
+  }
+}
+```
+
+```json 4-Week Moving Average
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "IC4WSA",
+    "limit": 52
+  }
+}
+```
+</CodeGroup>
+
+## Housing Market
+
+### Home Prices and Sales
+
+<CodeGroup>
+```json Case-Shiller Index
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "CSUSHPISA",
+    "units": "pc1",
+    "limit": 24
+  }
+}
+```
+
+```json New Home Sales
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "HSN1F",
+    "limit": 12
+  }
+}
+```
+
+```json Housing Starts
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "HOUST",
+    "limit": 12
+  }
+}
+```
+</CodeGroup>
+
+### Mortgage Rates
+
+<CodeGroup>
+```json 30-Year Fixed
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "MORTGAGE30US",
+    "limit": 52
+  }
+}
+```
+
+```json 15-Year Fixed
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "MORTGAGE15US",
+    "limit": 52
+  }
+}
+```
+</CodeGroup>
+
+## Financial Markets
+
+### Stock Market Indices
+
+<CodeGroup>
+```json S&P 500
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "SP500",
+    "limit": 252
+  }
+}
+```
+
+```json NASDAQ
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "NASDAQCOM",
+    "limit": 252
+  }
+}
+```
+
+```json VIX Volatility
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "VIXCLS",
+    "limit": 252
+  }
+}
+```
+</CodeGroup>
+
+### Exchange Rates
+
+<CodeGroup>
+```json EUR/USD
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "DEXUSEU",
+    "limit": 30
+  }
+}
+```
+
+```json USD/JPY
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "DEXJPUS",
+    "limit": 30
+  }
+}
+```
+
+```json Trade-Weighted Dollar
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "DTWEXBGS",
+    "limit": 52
+  }
+}
+```
+</CodeGroup>
+
+## Discovering Data
+
+### Search for Series
+
+<CodeGroup>
+```json Find Inflation Indicators
+{
+  "tool": "fred_search",
+  "params": {
+    "search_text": "inflation",
+    "tag_names": "usa,monthly",
+    "limit": 10
+  }
+}
+```
+
+```json Find State Data
+{
+  "tool": "fred_search",
+  "params": {
+    "search_text": "unemployment",
+    "tag_names": "state,monthly,sa",
+    "limit": 20
+  }
+}
+```
+
+```json Find Recession Indicators
+{
+  "tool": "fred_search",
+  "params": {
+    "search_text": "recession",
+    "order_by": "popularity",
+    "limit": 10
+  }
+}
+```
+</CodeGroup>
+
+### Browse Categories
+
+<CodeGroup>
+```json Explore Main Categories
+{
+  "tool": "fred_browse",
+  "params": {
+    "browse_type": "categories"
+  }
+}
+```
+
+```json Find Interest Rate Series
+{
+  "tool": "fred_browse",
+  "params": {
+    "browse_type": "category_series",
+    "category_id": 22,
+    "order_by": "popularity",
+    "limit": 20
+  }
+}
+```
+
+```json Browse Economic Releases
+{
+  "tool": "fred_browse",
+  "params": {
+    "browse_type": "releases",
+    "order_by": "name",
+    "limit": 30
+  }
+}
+```
+</CodeGroup>
+
+## Creating Reports
+
+### Economic Dashboard
+
+```javascript
+// Comprehensive economic snapshot
+async function getEconomicDashboard() {
+  const indicators = [
+    { id: "GDPC1", name: "Real GDP", transform: "pca" },
+    { id: "UNRATE", name: "Unemployment" },
+    { id: "CPIAUCSL", name: "CPI Inflation", transform: "pc1" },
+    { id: "DFF", name: "Fed Funds Rate" },
+    { id: "DGS10", name: "10-Year Treasury" },
+    { id: "SP500", name: "S&P 500" }
+  ];
+
+  const results = {};
+  for (const indicator of indicators) {
+    const params = {
+      series_id: indicator.id,
+      limit: 1,
+      sort_order: "desc"
+    };
+    if (indicator.transform) {
+      params.units = indicator.transform;
+    }
+    results[indicator.name] = await callTool("fred_get_series", params);
+  }
+  return results;
+}
+```
+
+### Comparative Analysis
+
+```javascript
+// Compare periods
+async function comparePeriods(seriesId, period1Start, period2Start) {
+  const period1 = await callTool("fred_get_series", {
+    series_id: seriesId,
+    observation_start: period1Start,
+    observation_end: addYear(period1Start),
+    units: "pc1"
+  });
+
+  const period2 = await callTool("fred_get_series", {
+    series_id: seriesId,
+    observation_start: period2Start,
+    observation_end: addYear(period2Start),
+    units: "pc1"
+  });
+
+  return { period1, period2 };
+}
+```
+
+## Tips for Effective Queries
+
+<Steps>
+  <Step title="Start Simple">
+    Begin with basic queries and add complexity as needed
+  </Step>
+
+  <Step title="Use Transformations">
+    Apply units transformations for meaningful comparisons
+  </Step>
+
+  <Step title="Check Frequency">
+    Ensure data frequencies match when comparing series
+  </Step>
+
+  <Step title="Handle Missing Data">
+    Some series have gaps; always check for null values
+  </Step>
+
+  <Step title="Optimize Requests">
+    Request only the data you need using limits and date ranges
+  </Step>
+</Steps>
+
+## Common Patterns
+
+### Latest Value Pattern
+```json
+{
+  "series_id": "SERIES_ID",
+  "limit": 1,
+  "sort_order": "desc"
+}
+```
+
+### Time Period Pattern
+```json
+{
+  "series_id": "SERIES_ID",
+  "observation_start": "START_DATE",
+  "observation_end": "END_DATE"
+}
+```
+
+### Growth Rate Pattern
+```json
+{
+  "series_id": "SERIES_ID",
+  "units": "pc1",  // or "pch", "pca"
+  "limit": 12
+}
+```
+
+### Frequency Conversion Pattern
+```json
+{
+  "series_id": "SERIES_ID",
+  "frequency": "m",  // or "q", "a"
+  "aggregation_method": "avg"
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Economic Indicators"
+    icon="chart-mixed"
+    href="/examples/economic-indicators"
+  >
+    Deep dive into key indicators
+  </Card>
+  <Card
+    title="Time Series Analysis"
+    icon="chart-line"
+    href="/examples/time-series-analysis"
+  >
+    Advanced analysis techniques
+  </Card>
+  <Card
+    title="Data Transformations"
+    icon="arrow-right-arrow-left"
+    href="/examples/data-transformations"
+  >
+    Master data transformations
+  </Card>
+  <Card
+    title="Advanced Queries"
+    icon="code"
+    href="/examples/advanced-queries"
+  >
+    Complex query patterns
+  </Card>
+</CardGroup>
