@@ -1,0 +1,555 @@
+---
+title: Configuration
+description: Complete configuration guide for FRED MCP Server
+icon: 'gear'
+---
+
+# Configuration
+
+This guide covers all configuration options for the FRED MCP Server, including environment variables, client setup, and advanced settings.
+
+## Environment Variables
+
+The FRED MCP Server uses environment variables for configuration. These can be set in your client configuration or system environment.
+
+### Required Variables
+
+<ParamField path="FRED_API_KEY" type="string" required>
+  Your FRED API key from the Federal Reserve Bank of St. Louis.
+
+  **How to obtain:**
+  1. Visit [fred.stlouisfed.org/docs/api/api_key.html](https://fred.stlouisfed.org/docs/api/api_key.html)
+  2. Register for a free account
+  3. Request an API key (instant approval)
+
+  <Warning>
+    Never commit your API key to version control. Use environment variables or secure key management.
+  </Warning>
+</ParamField>
+
+### Optional Variables
+
+<ParamField path="FRED_BASE_URL" type="string" default="https://api.stlouisfed.org/fred">
+  Override the FRED API base URL. Useful for:
+  - Using proxy servers
+  - Testing with mock services
+  - Enterprise deployments with custom endpoints
+</ParamField>
+
+<ParamField path="LOG_LEVEL" type="string" default="info">
+  Control the verbosity of server logs.
+
+  **Options:**
+  - `debug`: Detailed debugging information
+  - `info`: General information messages
+  - `warn`: Warning messages only
+  - `error`: Error messages only
+</ParamField>
+
+<ParamField path="MAX_RETRIES" type="number" default="3">
+  Maximum number of retry attempts for failed API requests.
+</ParamField>
+
+<ParamField path="TIMEOUT_MS" type="number" default="30000">
+  Request timeout in milliseconds (default: 30 seconds).
+</ParamField>
+
+## Client Configurations
+
+### Claude Desktop
+
+<Tabs>
+  <Tab title="Basic Configuration">
+    ```json
+    {
+      "mcpServers": {
+        "fred-mcp": {
+          "command": "fred-mcp-server",
+          "env": {
+            "FRED_API_KEY": "your_api_key_here"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Advanced Configuration">
+    ```json
+    {
+      "mcpServers": {
+        "fred-mcp": {
+          "command": "fred-mcp-server",
+          "env": {
+            "FRED_API_KEY": "your_api_key_here",
+            "LOG_LEVEL": "debug",
+            "MAX_RETRIES": "5",
+            "TIMEOUT_MS": "60000"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Multiple Instances">
+    ```json
+    {
+      "mcpServers": {
+        "fred-production": {
+          "command": "fred-mcp-server",
+          "env": {
+            "FRED_API_KEY": "production_key"
+          }
+        },
+        "fred-development": {
+          "command": "fred-mcp-server",
+          "env": {
+            "FRED_API_KEY": "development_key",
+            "LOG_LEVEL": "debug"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Docker Configuration
+
+<AccordionGroup>
+  <Accordion title="Docker Run Configuration">
+    ```bash
+    docker run -i --rm \
+      -e FRED_API_KEY="your_api_key" \
+      -e LOG_LEVEL="info" \
+      -e MAX_RETRIES="3" \
+      -e TIMEOUT_MS="30000" \
+      stefanoamorelli/fred-mcp-server:latest
+    ```
+  </Accordion>
+
+  <Accordion title="Docker Compose Configuration">
+    ```yaml
+    version: '3.8'
+
+    services:
+      fred-mcp:
+        image: stefanoamorelli/fred-mcp-server:latest
+        environment:
+          - FRED_API_KEY=${FRED_API_KEY}
+          - LOG_LEVEL=info
+          - MAX_RETRIES=3
+          - TIMEOUT_MS=30000
+        stdin_open: true
+        tty: false
+    ```
+  </Accordion>
+
+  <Accordion title="Kubernetes Deployment">
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: fred-mcp-server
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: fred-mcp
+      template:
+        metadata:
+          labels:
+            app: fred-mcp
+        spec:
+          containers:
+          - name: fred-mcp
+            image: stefanoamorelli/fred-mcp-server:latest
+            env:
+            - name: FRED_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fred-secrets
+                  key: api-key
+            - name: LOG_LEVEL
+              value: "info"
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Security Best Practices
+
+### API Key Management
+
+<Warning>
+  Never expose your FRED API key in public repositories, logs, or client-side code.
+</Warning>
+
+<Tabs>
+  <Tab title="Environment Files">
+    Use `.env` files with proper gitignore:
+
+    ```bash
+    # .env
+    FRED_API_KEY=your_secure_key_here
+    ```
+
+    ```bash
+    # .gitignore
+    .env
+    .env.local
+    .env.*.local
+    ```
+
+    Load in your application:
+    ```javascript
+    require('dotenv').config();
+    const apiKey = process.env.FRED_API_KEY;
+    ```
+  </Tab>
+
+  <Tab title="Secret Managers">
+    Use platform-specific secret managers:
+
+    **AWS Secrets Manager:**
+    ```javascript
+    const AWS = require('aws-sdk');
+    const client = new AWS.SecretsManager();
+
+    const secret = await client.getSecretValue({
+      SecretId: "fred-api-key"
+    }).promise();
+    ```
+
+    **Azure Key Vault:**
+    ```javascript
+    const { SecretClient } = require("@azure/keyvault-secrets");
+    const client = new SecretClient(vaultUrl, credential);
+    const secret = await client.getSecret("fred-api-key");
+    ```
+  </Tab>
+
+  <Tab title="CI/CD Secrets">
+    Configure in your CI/CD pipeline:
+
+    **GitHub Actions:**
+    ```yaml
+    steps:
+      - name: Run FRED MCP
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          fred-mcp-server
+    ```
+
+    **GitLab CI:**
+    ```yaml
+    variables:
+      FRED_API_KEY: $FRED_API_KEY  # Set in GitLab settings
+    ```
+  </Tab>
+</Tabs>
+
+### Network Security
+
+<AccordionGroup>
+  <Accordion title="Firewall Configuration">
+    If running as a service, restrict network access:
+
+    ```bash
+    # iptables example
+    iptables -A INPUT -p tcp --dport 3000 -s 127.0.0.1 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 3000 -j DROP
+    ```
+  </Accordion>
+
+  <Accordion title="TLS/SSL Configuration">
+    For production deployments with HTTP transport:
+
+    ```javascript
+    // Use with reverse proxy (recommended)
+    // nginx.conf
+    server {
+      listen 443 ssl;
+      ssl_certificate /path/to/cert.pem;
+      ssl_certificate_key /path/to/key.pem;
+
+      location /fred-mcp {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Performance Optimization
+
+### Rate Limiting
+
+FRED API has rate limits that you must respect:
+
+<Info>
+  Default FRED API limits:
+  - 120 requests per minute
+  - 40 requests per minute for series observations
+</Info>
+
+<ParamField path="RATE_LIMIT_REQUESTS" type="number" default="100">
+  Maximum requests per minute
+</ParamField>
+
+<ParamField path="RATE_LIMIT_BACKOFF" type="boolean" default="true">
+  Enable exponential backoff on rate limit errors
+</ParamField>
+
+## Logging Configuration
+
+### Log Formats
+
+<Tabs>
+  <Tab title="JSON Logging">
+    ```bash
+    export LOG_FORMAT="json"
+    export LOG_LEVEL="info"
+
+    # Output:
+    # {"timestamp":"2025-01-20T10:30:45Z","level":"info","message":"Server started"}
+    ```
+  </Tab>
+
+  <Tab title="Text Logging">
+    ```bash
+    export LOG_FORMAT="text"
+    export LOG_LEVEL="debug"
+
+    # Output:
+    # 2025-01-20 10:30:45 [INFO] Server started
+    # 2025-01-20 10:30:46 [DEBUG] Processing request...
+    ```
+  </Tab>
+</Tabs>
+
+### Log Destinations
+
+<AccordionGroup>
+  <Accordion title="File Logging">
+    ```bash
+    # Redirect to file
+    fred-mcp-server > /var/log/fred-mcp.log 2>&1
+
+    # With rotation
+    fred-mcp-server | rotatelogs /var/log/fred-mcp-%Y%m%d.log 86400
+    ```
+  </Accordion>
+
+  <Accordion title="Syslog Integration">
+    ```bash
+    # Send to syslog
+    fred-mcp-server | logger -t fred-mcp -p local0.info
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Development Configuration
+
+### Local Development
+
+<Steps>
+  <Step title="Create Development Config">
+    ```json
+    // .claude/dev-config.json
+    {
+      "mcpServers": {
+        "fred-dev": {
+          "command": "node",
+          "args": ["./build/index.js"],
+          "cwd": "/path/to/fred-mcp-server",
+          "env": {
+            "FRED_API_KEY": "dev_key",
+            "LOG_LEVEL": "debug",
+            "NODE_ENV": "development"
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Set Development Variables">
+    ```bash
+    # .env.development
+    FRED_API_KEY=your_dev_key
+    LOG_LEVEL=debug
+    NODE_ENV=development
+    ```
+  </Step>
+
+  <Step title="Run Development Server">
+    ```bash
+    # Load dev environment and run
+    source .env.development
+    npm run start
+    ```
+  </Step>
+</Steps>
+
+### Testing Configuration
+
+<CodeGroup>
+```javascript Jest Config
+// jest.config.js
+module.exports = {
+  testEnvironment: 'node',
+  setupFiles: ['./test/setup.js'],
+  env: {
+    FRED_API_KEY: 'test_key',
+    FRED_BASE_URL: 'http://localhost:3001/mock-fred',
+    LOG_LEVEL: 'error'
+  }
+};
+```
+
+```bash Mock Server
+# Start mock FRED server for testing
+docker run -d -p 3001:3001 \
+  -e MOCK_MODE=true \
+  fred-mock-server
+```
+
+```typescript Test Setup
+// test/setup.ts
+process.env.FRED_API_KEY = 'test_key';
+process.env.LOG_LEVEL = 'error';
+process.env.NODE_ENV = 'test';
+```
+</CodeGroup>
+
+## Monitoring & Alerts
+
+### Health Checks
+
+Configure health monitoring:
+
+<ParamField path="HEALTH_CHECK_ENABLED" type="boolean" default="false">
+  Enable health check endpoint
+</ParamField>
+
+<ParamField path="HEALTH_CHECK_INTERVAL" type="number" default="60000">
+  Health check interval in milliseconds
+</ParamField>
+
+### Metrics Collection
+
+<AccordionGroup>
+  <Accordion title="Prometheus Metrics">
+    ```javascript
+    // Enable metrics collection
+    export METRICS_ENABLED=true
+    export METRICS_PORT=9090
+
+    // Prometheus config
+    scrape_configs:
+      - job_name: 'fred-mcp'
+        static_configs:
+          - targets: ['localhost:9090']
+    ```
+  </Accordion>
+
+  <Accordion title="Custom Metrics">
+    ```javascript
+    // Track custom metrics
+    export TRACK_USAGE=true
+    export USAGE_REPORT_INTERVAL=3600000  // 1 hour
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting Configuration
+
+### Debug Mode
+
+Enable comprehensive debugging:
+
+```bash
+# Maximum debugging
+export LOG_LEVEL=debug
+export DEBUG=fred:*
+export NODE_DEBUG=mcp
+export TRACE_REQUESTS=true
+
+fred-mcp-server
+```
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Configuration not loading">
+    **Symptoms:** Default values used instead of configured values
+
+    **Solutions:**
+    1. Check JSON syntax in config file
+    2. Verify environment variable names (case-sensitive)
+    3. Ensure config file is saved
+    4. Restart client application
+  </Accordion>
+
+  <Accordion title="Permission errors">
+    **Symptoms:** Cannot read/write configuration
+
+    **Solutions:**
+    ```bash
+    # Fix permissions
+    chmod 600 ~/.config/claude/claude_desktop_config.json
+    chown $USER:$USER ~/.config/claude/claude_desktop_config.json
+    ```
+  </Accordion>
+
+  <Accordion title="Environment variables not set">
+    **Symptoms:** API key not found errors
+
+    **Check variables:**
+    ```bash
+    # Linux/Mac
+    echo $FRED_API_KEY
+    env | grep FRED
+
+    # Windows
+    echo %FRED_API_KEY%
+    set | findstr FRED
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/overview"
+  >
+    Explore available tools and parameters
+  </Card>
+  <Card
+    title="Examples"
+    icon="flask"
+    href="/examples/basic-usage"
+  >
+    See configuration in action
+  </Card>
+  <Card
+    title="Troubleshooting"
+    icon="wrench"
+    href="/resources/troubleshooting"
+  >
+    Solve common configuration issues
+  </Card>
+  <Card
+    title="Security"
+    icon="shield"
+    href="/community/security"
+  >
+    Security best practices
+  </Card>
+</CardGroup>
