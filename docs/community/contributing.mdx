@@ -1,0 +1,147 @@
+---
+title: Contributing
+description: How to contribute to FRED MCP Server
+icon: 'code-pull-request'
+---
+
+# Contributing
+
+We welcome contributions to the FRED MCP Server! This guide will help you get started.
+
+## Ways to Contribute
+
+<CardGroup cols={2}>
+  <Card title="Report Bugs" icon="bug">
+    Found an issue? Let us know on GitHub Issues
+  </Card>
+  <Card title="Suggest Features" icon="lightbulb">
+    Have an idea? Open a feature request
+  </Card>
+  <Card title="Improve Docs" icon="book">
+    Help make documentation clearer
+  </Card>
+  <Card title="Submit Code" icon="code">
+    Fix bugs or add features via pull requests
+  </Card>
+</CardGroup>
+
+## Development Setup
+
+<Steps>
+  <Step title="Fork the Repository">
+    Fork [fred-mcp-server](https://github.com/stefanoamorelli/fred-mcp-server) on GitHub
+  </Step>
+
+  <Step title="Clone Your Fork">
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/fred-mcp-server.git
+    cd fred-mcp-server
+    ```
+  </Step>
+
+  <Step title="Install Dependencies">
+    ```bash
+    pnpm install
+    ```
+  </Step>
+
+  <Step title="Build the Project">
+    ```bash
+    pnpm run build
+    ```
+  </Step>
+
+  <Step title="Run Tests">
+    ```bash
+    pnpm test
+    ```
+  </Step>
+</Steps>
+
+## Making Changes
+
+### Code Style
+
+- Follow existing code style
+- Use TypeScript for type safety
+- Add tests for new features
+- Update documentation
+
+### Testing
+
+```bash
+# Run all tests
+pnpm test
+
+# Run specific test
+pnpm test -- registry.test.ts
+
+# Watch mode
+pnpm run test:watch
+```
+
+### Commits
+
+Use conventional commit messages:
+
+```
+feat: add new search filter
+fix: resolve rate limiting issue
+docs: update installation guide
+test: add tests for browse functionality
+```
+
+## Pull Requests
+
+<Steps>
+  <Step title="Create Branch">
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
+  </Step>
+
+  <Step title="Make Changes">
+    Write code, add tests, update docs
+  </Step>
+
+  <Step title="Run Tests">
+    Ensure all tests pass
+  </Step>
+
+  <Step title="Commit">
+    ```bash
+    git commit -m "feat: your feature description"
+    ```
+  </Step>
+
+  <Step title="Push">
+    ```bash
+    git push origin feature/your-feature-name
+    ```
+  </Step>
+
+  <Step title="Open PR">
+    Create pull request on GitHub
+  </Step>
+</Steps>
+
+## Code of Conduct
+
+Please read and follow our [Code of Conduct](/community/code-of-conduct).
+
+## Questions?
+
+- GitHub Discussions
+- Open an issue
+- Email: stefano@amorelli.tech
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Code of Conduct" icon="handshake" href="/community/code-of-conduct">
+    Community guidelines
+  </Card>
+  <Card title="Security" icon="shield" href="/community/security">
+    Report security issues
+  </Card>
+</CardGroup>
