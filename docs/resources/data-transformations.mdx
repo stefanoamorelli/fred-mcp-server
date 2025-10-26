@@ -1,0 +1,62 @@
+---
+title: Data Transformations Reference
+description: Complete reference for FRED data transformations
+icon: 'calculator'
+---
+
+# Data Transformations Reference
+
+Quick reference guide for all available FRED data transformations.
+
+## Transformation Codes
+
+| Code | Name | Formula | Use Case |
+|------|------|---------|----------|
+| lin | Levels | x_t | Raw values |
+| chg | Change | x_t - x_{t-1} | Period change |
+| ch1 | Change YoY | x_t - x_{t-n} | Annual change |
+| pch | % Change | ((x_t/x_{t-1})-1)*100 | Growth rate |
+| pc1 | % Change YoY | ((x_t/x_{t-n})-1)*100 | Annual growth |
+| pca | Annual Rate | (((x_t/x_{t-1})^n)-1)*100 | Annualized |
+| cch | Log Change | (ln(x_t)-ln(x_{t-1}))*100 | Log returns |
+| cca | Log Annual | (ln(x_t)-ln(x_{t-n}))*100 | Annual log |
+| log | Natural Log | ln(x_t) | Log levels |
+
+## Selection Guide
+
+### By Data Type
+
+**Flow Variables** (rates, prices):
+- Use: pch, pc1, pca
+- Example: Inflation, interest rates
+
+**Stock Variables** (levels, balances):
+- Use: chg, ch1
+- Example: Employment, inventories
+
+**Financial Returns**:
+- Use: cch, log
+- Example: Stock prices, exchange rates
+
+## Common Mistakes
+
+❌ **Don't:**
+- Transform already-transformed series
+- Mix frequencies when comparing
+- Ignore seasonal adjustment
+
+✅ **Do:**
+- Check original units
+- Use consistent transformations
+- Document your choices
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Examples" icon="code" href="/examples/data-transformations">
+    Practical examples
+  </Card>
+  <Card title="API Reference" icon="book" href="/api-reference/fred-get-series">
+    API documentation
+  </Card>
+</CardGroup>

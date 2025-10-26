@@ -1,0 +1,66 @@
+---
+title: FRED Series Guide
+description: Comprehensive guide to understanding and finding FRED series
+icon: 'map'
+---
+
+# FRED Series Guide
+
+Navigate FRED's vast collection of economic data series with this comprehensive reference guide.
+
+## Series ID Structure
+
+### Common Patterns
+
+FRED series IDs follow recognizable patterns:
+
+| Pattern | Example | Description |
+|---------|---------|-------------|
+| Indicator name | GDP, CPI | Simple acronyms |
+| Geographic prefix | CAUR, NYUR | State code + indicator |
+| Frequency suffix | UNRATEM | M=Monthly, Q=Quarterly |
+| Adjustment suffix | GDPC1 | C=Chained, SA implied |
+
+## Major Categories
+
+### National Accounts
+
+GDP and related series:
+
+- **GDP**: Gross Domestic Product
+- **GDPC1**: Real GDP
+- **GDPDEF**: GDP Deflator
+- **PCE**: Personal Consumption
+- **GPDI**: Gross Private Investment
+- **GCE**: Government Consumption
+
+### Employment
+
+Labor market indicators:
+
+- **UNRATE**: Unemployment Rate (SA)
+- **PAYEMS**: Total Nonfarm Payrolls (SA)
+- **CIVPART**: Labor Force Participation
+- **ICSA**: Initial Jobless Claims
+- **JO TS JOL**: Job Openings
+
+### Prices
+
+Inflation measures:
+
+- **CPIAUCSL**: CPI All Items (SA)
+- **CPILFESL**: Core CPI (SA)
+- **PCEPI**: PCE Price Index
+- **PCEPILFE**: Core PCE
+- **PPIACO**: Producer Price Index
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Common Series" icon="star" href="/resources/common-series">
+    Most popular indicators
+  </Card>
+  <Card title="API Reference" icon="book" href="/api-reference/overview">
+    Search and retrieve data
+  </Card>
+</CardGroup>
