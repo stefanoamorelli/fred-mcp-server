@@ -1,0 +1,104 @@
+---
+title: Financial Research
+description: Using FRED for financial markets analysis and investment research
+icon: 'chart-candlestick'
+---
+
+# Financial Research Use Case
+
+Use FRED MCP Server for financial markets analysis, portfolio research, and investment strategy development.
+
+## Market Analysis
+
+### Equity Markets
+
+```javascript
+// Major indices
+const indices = {
+  sp500: "SP500",
+  dow: "DJIA",
+  nasdaq: "NASDAQCOM",
+  russell2000: "RU2000PR",
+  wilshire5000: "WILL5000PRFC"
+};
+```
+
+### Fixed Income
+
+```javascript
+// Treasury yields
+const treasuries = {
+  three_month: "DGS3MO",
+  two_year: "DGS2",
+  five_year: "DGS5",
+  ten_year: "DGS10",
+  thirty_year: "DGS30"
+};
+
+// Corporate spreads
+const spreads = {
+  aaa_corporate: "DAAA",
+  baa_corporate: "DBAA",
+  high_yield: "BAMLH0A0HYM2"
+};
+```
+
+### Exchange Rates
+
+```javascript
+// Major currencies
+const currencies = {
+  euro: "DEXUSEU",
+  pound: "DEXUSUK",
+  yen: "DEXJPUS",
+  yuan: "DEXCHUS",
+  swiss_franc: "DEXSZUS"
+};
+```
+
+## Risk Analysis
+
+### Volatility Indicators
+
+```javascript
+// VIX
+{ "series_id": "VIXCLS" }
+
+// Credit spreads
+{ "series_id": "BAMLH0A0HYM2" }
+
+// Financial stress
+{ "series_id": "STLFSI2" }
+```
+
+## Asset Allocation
+
+### Economic Regime Analysis
+
+Track indicators to inform asset allocation decisions based on economic conditions.
+
+<CardGroup cols={2}>
+  <Card title="Growth" icon="chart-line-up">
+    GDP, Employment, Industrial Production
+  </Card>
+  <Card title="Inflation" icon="fire">
+    CPI, PCE, Breakeven Rates
+  </Card>
+  <Card title="Policy" icon="landmark">
+    Fed Funds Rate, Balance Sheet
+  </Card>
+  <Card title="Sentiment" icon="face-smile">
+    Consumer Confidence, Business Surveys
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Market Monitoring" icon="display" href="/use-cases/market-monitoring">
+    Real-time market tracking
+  </Card>
+  <Card title="Examples" icon="code" href="/examples/basic-usage">
+    Code examples
+  </Card>
+</CardGroup>

@@ -1,0 +1,74 @@
+---
+title: Policy Analysis
+description: Evaluating economic policy impacts using FRED data
+icon: 'landmark'
+---
+
+# Policy Analysis
+
+Use FRED to evaluate policy effectiveness, analyze interventions, and support evidence-based policymaking.
+
+## Monetary Policy Analysis
+
+### Federal Reserve Actions
+
+```javascript
+// Policy rate
+{ "series_id": "DFF" }
+
+// Balance sheet
+{ "series_id": "WALCL" }
+
+// Reserve balances
+{ "series_id": "WRESBAL" }
+```
+
+### Policy Transmission
+
+Track how policy changes affect the economy through various channels.
+
+## Fiscal Policy
+
+### Government Spending
+
+```javascript
+// Federal spending
+{ "series_id": "FGEXPND" }
+
+// Receipts
+{ "series_id": "FGRECPT" }
+
+// Deficit
+{ "series_id": "FYFSD" }
+
+// Debt
+{ "series_id": "GFDEBTN" }
+```
+
+## Impact Evaluation
+
+<Steps>
+  <Step title="Identify Policy Change">
+    Mark exact timing of policy implementation
+  </Step>
+  <Step title="Select Indicators">
+    Choose relevant outcome measures
+  </Step>
+  <Step title="Analyze Before/After">
+    Compare periods pre and post intervention
+  </Step>
+  <Step title="Control for Confounders">
+    Account for other simultaneous changes
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Economic Analysis" icon="chart-mixed" href="/use-cases/economic-analysis">
+    Comprehensive analysis workflows
+  </Card>
+  <Card title="Examples" icon="code" href="/examples/economic-indicators">
+    Indicator examples
+  </Card>
+</CardGroup>
