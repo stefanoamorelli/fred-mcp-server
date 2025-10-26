@@ -1,0 +1,128 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "FRED MCP Server Documentation",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#1E40AF",
+    "light": "#3B82F6",
+    "dark": "#1E3A8A",
+    "anchors": {
+      "from": "#1E40AF",
+      "to": "#3B82F6"
+    }
+  },
+  "topbarCtaButton": {
+    "name": "GitHub",
+    "url": "https://github.com/stefanoamorelli/fred-mcp-server"
+  },
+  "topbarLinks": [
+    {
+      "name": "NPM",
+      "url": "https://www.npmjs.com/package/fred-mcp-server"
+    }
+  ],
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    },
+    {
+      "name": "Examples",
+      "url": "examples"
+    },
+    {
+      "name": "Use Cases",
+      "url": "use-cases"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "installation",
+        "configuration"
+      ]
+    },
+    {
+      "group": "Core Concepts",
+      "pages": [
+        "core-concepts/overview",
+        "core-concepts/mcp-protocol",
+        "core-concepts/fred-data",
+        "core-concepts/authentication"
+      ]
+    },
+    {
+      "group": "API Tools",
+      "pages": [
+        "api-reference/overview",
+        "api-reference/fred-browse",
+        "api-reference/fred-search",
+        "api-reference/fred-get-series"
+      ]
+    },
+    {
+      "group": "Examples",
+      "pages": [
+        "examples/basic-usage",
+        "examples/economic-indicators",
+        "examples/time-series-analysis",
+        "examples/data-transformations",
+        "examples/advanced-queries"
+      ]
+    },
+    {
+      "group": "Use Cases",
+      "pages": [
+        "use-cases/economic-analysis",
+        "use-cases/financial-research",
+        "use-cases/academic-research",
+        "use-cases/policy-analysis",
+        "use-cases/market-monitoring"
+      ]
+    },
+    {
+      "group": "Resources",
+      "pages": [
+        "resources/fred-series-guide",
+        "resources/common-series",
+        "resources/data-transformations",
+        "resources/troubleshooting",
+        "resources/faq"
+      ]
+    },
+    {
+      "group": "Community",
+      "pages": [
+        "community/contributing",
+        "community/code-of-conduct",
+        "community/security",
+        "community/changelog",
+        "community/license"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "x": "https://x.com/stefanoamorelli",
+    "github": "https://github.com/stefanoamorelli",
+    "linkedin": "https://www.linkedin.com/in/stefanoamorelli"
+  },
+  "analytics": {
+    "ga4": {
+      "measurementId": "G-XXXXXXXXXX"
+    }
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true
+  },
+  "api": {
+    "maintainOrder": true
+  }
+}

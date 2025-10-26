@@ -5,7 +5,17 @@ authors:
     given-names: Stefano
     orcid: https://orcid.org/0009-0004-4917-0999
 title: "Federal Reserve Economic Data MCP (Model Context Protocol) Server"
-version: 1.0.0
-date-released: 2025-05-13
+version: 1.0.2
+doi: 10.5281/zenodo.14536707
+date-released: 2025-01-16
 url: https://github.com/stefanoamorelli/fred-mcp-server
+repository-code: https://github.com/stefanoamorelli/fred-mcp-server
+license: AGPL-3.0
+keywords:
+  - fred
+  - federal-reserve
+  - economic-data
+  - time-series
+  - mcp
+  - model-context-protocol
 
