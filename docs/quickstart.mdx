@@ -1,0 +1,292 @@
+---
+title: Quick Start
+description: Get up and running with FRED MCP Server in 5 minutes
+icon: 'rocket'
+---
+
+# Quick Start Guide
+
+Get the FRED MCP Server running with your AI assistant in just a few minutes. This guide will walk you through the fastest path to start querying economic data.
+
+## Prerequisites
+
+<Steps>
+  <Step title="Get a FRED API Key">
+    Visit [fred.stlouisfed.org/docs/api/api_key.html](https://fred.stlouisfed.org/docs/api/api_key.html) to register for a free API key.
+
+    <Info>
+      The API key is free and provides access to all FRED data. Registration takes less than a minute.
+    </Info>
+  </Step>
+
+  <Step title="Install Claude Desktop (or another MCP client)">
+    Download [Claude Desktop](https://claude.ai/download) or ensure you have another MCP-compatible client installed.
+  </Step>
+</Steps>
+
+## Installation
+
+Choose your preferred installation method:
+
+<Tabs>
+  <Tab title="Automatic (Smithery)">
+    The fastest way to install is using [Smithery](https://smithery.ai):
+
+    ```bash
+    npx -y @smithery/cli install @stefanoamorelli/fred-mcp-server --client claude
+    ```
+
+    This command will:
+    - Install the server
+    - Configure it for Claude Desktop
+    - Prompt you for your FRED API key
+  </Tab>
+
+  <Tab title="NPM Global">
+    Install globally via NPM:
+
+    ```bash
+    npm install -g fred-mcp-server
+    ```
+
+    Then add to your Claude Desktop config:
+
+    ```json
+    {
+      "mcpServers": {
+        "fred-mcp": {
+          "command": "fred-mcp-server",
+          "env": {
+            "FRED_API_KEY": "your_api_key_here"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Docker">
+    Use the pre-built Docker image:
+
+    ```json
+    {
+      "mcpServers": {
+        "fred-mcp": {
+          "command": "docker",
+          "args": [
+            "run",
+            "-i",
+            "--rm",
+            "-e",
+            "FRED_API_KEY=your_api_key_here",
+            "stefanoamorelli/fred-mcp-server:latest"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Configuration
+
+### Claude Desktop Configuration
+
+<Accordion title="Finding your configuration file">
+  The Claude Desktop configuration file location varies by platform:
+
+  - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+  - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+  - **Linux**: `~/.config/claude/claude_desktop_config.json`
+</Accordion>
+
+Edit your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "fred-mcp": {
+      "command": "fred-mcp-server",
+      "env": {
+        "FRED_API_KEY": "your_actual_api_key_here"
+      }
+    }
+  }
+}
+```
+
+<Warning>
+  Replace `your_actual_api_key_here` with your actual FRED API key. Keep this key secure and never commit it to version control.
+</Warning>
+
+## Verify Installation
+
+After configuration, restart Claude Desktop and verify the server is working:
+
+<Steps>
+  <Step title="Restart Claude Desktop">
+    Completely quit and restart Claude Desktop to load the new configuration.
+  </Step>
+
+  <Step title="Check MCP Connection">
+    In Claude, you should see "fred-mcp" in the MCP servers list (look for the 🔌 icon).
+  </Step>
+
+  <Step title="Test a Query">
+    Try asking Claude:
+
+    ```text
+    "What's the current US GDP growth rate?"
+    ```
+
+    Claude should use the `fred_get_series` tool to fetch the data.
+  </Step>
+</Steps>
+
+## Your First Queries
+
+Now that you're set up, try these example queries to explore FRED data:
+
+### Basic Economic Indicators
+
+<CodeGroup>
+```text Unemployment Rate
+"Show me the US unemployment rate for the last year"
+```
+
+```text Inflation
+"What's the current inflation rate (CPI)?"
+```
+
+```text GDP Growth
+"Get quarterly GDP growth rates for 2024"
+```
+</CodeGroup>
+
+### Advanced Queries
+
+<CodeGroup>
+```text Search for Data
+"Search for all inflation-related indicators"
+```
+
+```text Browse Categories
+"Browse available economic categories"
+```
+
+```text Historical Analysis
+"Compare unemployment rates during the last three recessions"
+```
+</CodeGroup>
+
+## Common Series IDs
+
+Here are some frequently used FRED series IDs:
+
+<AccordionGroup>
+  <Accordion title="Key Economic Indicators">
+    - **GDP**: Real Gross Domestic Product
+    - **UNRATE**: Unemployment Rate
+    - **CPIAUCSL**: Consumer Price Index (All Urban Consumers)
+    - **CPILFESL**: Core CPI (Less Food and Energy)
+    - **PAYEMS**: All Employees, Total Nonfarm Payrolls
+  </Accordion>
+
+  <Accordion title="Interest Rates">
+    - **DFF**: Federal Funds Effective Rate
+    - **DGS10**: 10-Year Treasury Rate
+    - **DGS2**: 2-Year Treasury Rate
+    - **TB3MS**: 3-Month Treasury Bill
+    - **MORTGAGE30US**: 30-Year Fixed Rate Mortgage Average
+  </Accordion>
+
+  <Accordion title="Stock Market">
+    - **SP500**: S&P 500 Index
+    - **DJIA**: Dow Jones Industrial Average
+    - **NASDAQCOM**: NASDAQ Composite Index
+    - **VIXCLS**: CBOE Volatility Index (VIX)
+  </Accordion>
+
+  <Accordion title="Housing">
+    - **HOUST**: Housing Starts
+    - **CSUSHPISA**: Case-Shiller Home Price Index
+    - **PERMIT**: Building Permits
+    - **MSACSR**: Monthly Supply of Houses
+  </Accordion>
+</AccordionGroup>
+
+## Example Conversations
+
+### Economic Analysis
+```text
+You: "Analyze the relationship between unemployment and inflation over the last decade"
+
+Claude: I'll analyze the relationship between unemployment and inflation using FRED data...
+[Uses fred_get_series to fetch UNRATE and CPIAUCSL data]
+[Provides analysis with data visualization]
+```
+
+### Market Monitoring
+```text
+You: "Create a dashboard of key economic indicators for Q4 2024"
+
+Claude: I'll gather the key economic indicators for Q4 2024...
+[Uses multiple fred_get_series calls to fetch GDP, UNRATE, CPI, etc.]
+[Presents organized data summary]
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Server not appearing in Claude">
+    1. Ensure configuration file is valid JSON
+    2. Check the file path is correct for your OS
+    3. Restart Claude Desktop completely
+    4. Verify the server command is in your PATH
+  </Accordion>
+
+  <Accordion title="API Key errors">
+    - Verify your API key is valid at [fred.stlouisfed.org](https://fred.stlouisfed.org)
+    - Ensure the key is properly quoted in the config
+    - Check for extra spaces or characters
+  </Accordion>
+
+  <Accordion title="No data returned">
+    - Check the series ID is correct (case-sensitive)
+    - Verify the date range includes available data
+    - Try a known working series like "GDP" or "UNRATE"
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Installation Guide"
+    icon="download"
+    href="/installation"
+  >
+    Detailed installation for all platforms
+  </Card>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/overview"
+  >
+    Complete documentation of all tools
+  </Card>
+  <Card
+    title="Examples"
+    icon="flask"
+    href="/examples/basic-usage"
+  >
+    Learn with practical examples
+  </Card>
+  <Card
+    title="Common Series"
+    icon="list"
+    href="/resources/common-series"
+  >
+    Popular FRED series reference
+  </Card>
+</CardGroup>
