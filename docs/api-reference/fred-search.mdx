@@ -1,0 +1,576 @@
+---
+title: fred_search
+description: Search for FRED economic data series by keywords, tags, or filters
+icon: 'magnifying-glass'
+---
+
+# fred_search
+
+Search across all 800,000+ FRED series using powerful text search, tag filtering, and attribute filters.
+
+## Overview
+
+The `fred_search` tool enables sophisticated searching across FRED's vast database. Use it to:
+
+- Find series by keywords in titles and descriptions
+- Filter by tags like "gdp", "monthly", "seasonally adjusted"
+- Combine multiple search criteria
+- Filter by frequency, units, or seasonal adjustment
+- Sort by relevance, popularity, or recency
+
+## Parameters
+
+<ParamField path="search_text" type="string">
+  Text to search for in series titles and descriptions.
+
+  **Search tips:**
+  - Use specific terms like "unemployment rate" or "consumer price index"
+  - Searches are case-insensitive
+  - Multiple words are searched as phrases
+  - Partial matches are included
+</ParamField>
+
+<ParamField path="search_type" type="string" default="full_text">
+  Type of search to perform.
+
+  **Options:**
+  - `full_text`: Search titles and descriptions
+  - `series_id`: Search by exact series ID match
+</ParamField>
+
+<ParamField path="tag_names" type="string">
+  Comma-separated list of tags to filter by. All specified tags must be present.
+
+  **Common tags:**
+  - Geographic: `usa`, `state`, `county`, `msa`
+  - Frequency: `daily`, `weekly`, `monthly`, `quarterly`, `annual`
+  - Adjustment: `sa` (seasonally adjusted), `nsa` (not seasonally adjusted)
+  - Topic: `gdp`, `inflation`, `employment`, `housing`, `interest rate`
+
+  **Example:** `"monthly,sa,employment"`
+</ParamField>
+
+<ParamField path="exclude_tag_names" type="string">
+  Comma-separated list of tags to exclude. Series with these tags will be filtered out.
+
+  **Example:** `"discontinued,projection"`
+</ParamField>
+
+<ParamField path="limit" type="number" default="25">
+  Maximum number of results to return (1-1000).
+</ParamField>
+
+<ParamField path="offset" type="number" default="0">
+  Number of results to skip for pagination.
+</ParamField>
+
+<ParamField path="order_by" type="string" default="search_rank">
+  Field to order results by.
+
+  **Options:**
+  - `search_rank`: Relevance to search terms
+  - `series_id`: Alphabetical by ID
+  - `title`: Alphabetical by title
+  - `popularity`: Most accessed series first
+  - `last_updated`: Most recently updated
+  - `observation_start`: Earliest data first
+  - `observation_end`: Latest data first
+  - `frequency`: Grouped by frequency
+  - `units`: Grouped by units
+</ParamField>
+
+<ParamField path="sort_order" type="string" default="desc">
+  Sort order for results.
+
+  **Options:**
+  - `asc`: Ascending order
+  - `desc`: Descending order
+</ParamField>
+
+<ParamField path="filter_variable" type="string">
+  Variable to filter by.
+
+  **Options:**
+  - `frequency`: Filter by data frequency
+  - `units`: Filter by measurement units
+  - `seasonal_adjustment`: Filter by adjustment type
+</ParamField>
+
+<ParamField path="filter_value" type="string">
+  Value to filter the variable by. Must be used with `filter_variable`.
+
+  **Frequency values:**
+  - `d`: Daily
+  - `w`: Weekly
+  - `m`: Monthly
+  - `q`: Quarterly
+  - `a`: Annual
+
+  **Units values:**
+  - `lin`: Levels
+  - `pch`: Percent change
+  - `pc1`: Percent change from year ago
+  - `index`: Index values
+
+  **Seasonal adjustment values:**
+  - `sa`: Seasonally adjusted
+  - `nsa`: Not seasonally adjusted
+</ParamField>
+
+## Examples
+
+### Basic Keyword Search
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_search",
+  "params": {
+    "search_text": "unemployment rate",
+    "limit": 5
+  }
+}
+```
+
+```json Response
+{
+  "series": [
+    {
+      "id": "UNRATE",
+      "title": "Unemployment Rate",
+      "observation_start": "1948-01-01",
+      "observation_end": "2024-12-01",
+      "frequency": "Monthly",
+      "units": "Percent",
+      "seasonal_adjustment": "Seasonally Adjusted",
+      "popularity": 98,
+      "tags": ["usa", "monthly", "sa", "labor", "unemployment"]
+    },
+    {
+      "id": "U6RATE",
+      "title": "Total Unemployed, Plus All Marginally Attached Workers",
+      "observation_start": "1994-01-01",
+      "observation_end": "2024-12-01",
+      "frequency": "Monthly",
+      "units": "Percent",
+      "seasonal_adjustment": "Seasonally Adjusted",
+      "popularity": 85,
+      "tags": ["usa", "monthly", "sa", "labor", "u6"]
+    }
+  ],
+  "metadata": {
+    "count": 5,
+    "total": 1247
+  }
+}
+```
+</CodeGroup>
+
+### Search with Tag Filtering
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_search",
+  "params": {
+    "search_text": "inflation",
+    "tag_names": "usa,monthly,sa",
+    "limit": 3
+  }
+}
+```
+
+```json Response
+{
+  "series": [
+    {
+      "id": "CPIAUCSL",
+      "title": "Consumer Price Index for All Urban Consumers: All Items",
+      "frequency": "Monthly",
+      "units": "Index 1982-1984=100",
+      "seasonal_adjustment": "Seasonally Adjusted",
+      "tags": ["usa", "monthly", "sa", "cpi", "inflation", "price"]
+    },
+    {
+      "id": "CPILFESL",
+      "title": "Consumer Price Index: All Items Less Food and Energy",
+      "frequency": "Monthly",
+      "units": "Index 1982-1984=100",
+      "seasonal_adjustment": "Seasonally Adjusted",
+      "tags": ["usa", "monthly", "sa", "core cpi", "inflation"]
+    },
+    {
+      "id": "PCEPI",
+      "title": "Personal Consumption Expenditures: Chain-type Price Index",
+      "frequency": "Monthly",
+      "units": "Index 2017=100",
+      "seasonal_adjustment": "Seasonally Adjusted",
+      "tags": ["usa", "monthly", "sa", "pce", "inflation"]
+    }
+  ]
+}
+```
+</CodeGroup>
+
+### Filter by Frequency
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_search",
+  "params": {
+    "search_text": "gdp",
+    "filter_variable": "frequency",
+    "filter_value": "q",
+    "order_by": "popularity",
+    "limit": 5
+  }
+}
+```
+
+```json Response
+{
+  "series": [
+    {
+      "id": "GDP",
+      "title": "Gross Domestic Product",
+      "frequency": "Quarterly",
+      "units": "Billions of Dollars",
+      "seasonal_adjustment": "Seasonally Adjusted Annual Rate"
+    },
+    {
+      "id": "GDPC1",
+      "title": "Real Gross Domestic Product",
+      "frequency": "Quarterly",
+      "units": "Billions of Chained 2017 Dollars",
+      "seasonal_adjustment": "Seasonally Adjusted Annual Rate"
+    }
+  ]
+}
+```
+</CodeGroup>
+
+### Search by Series ID
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_search",
+  "params": {
+    "search_text": "DGS10",
+    "search_type": "series_id"
+  }
+}
+```
+
+```json Response
+{
+  "series": [
+    {
+      "id": "DGS10",
+      "title": "Market Yield on U.S. Treasury Securities at 10-Year Constant Maturity",
+      "frequency": "Daily",
+      "units": "Percent",
+      "observation_start": "1962-01-02",
+      "observation_end": "2024-12-31"
+    }
+  ]
+}
+```
+</CodeGroup>
+
+### Exclude Discontinued Series
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_search",
+  "params": {
+    "search_text": "federal funds",
+    "exclude_tag_names": "discontinued",
+    "limit": 5
+  }
+}
+```
+
+```json Response
+{
+  "series": [
+    {
+      "id": "DFF",
+      "title": "Federal Funds Effective Rate",
+      "frequency": "Daily",
+      "status": "Active"
+    },
+    {
+      "id": "FEDFUNDS",
+      "title": "Federal Funds Effective Rate",
+      "frequency": "Monthly",
+      "status": "Active"
+    }
+  ]
+}
+```
+</CodeGroup>
+
+## Search Strategies
+
+### Finding Economic Indicators
+
+<Tabs>
+  <Tab title="GDP & Growth">
+    ```json
+    {
+      "search_text": "gross domestic product",
+      "tag_names": "usa,gdp",
+      "filter_variable": "frequency",
+      "filter_value": "q"
+    }
+    ```
+
+    **Key Series:**
+    - GDP: Nominal GDP
+    - GDPC1: Real GDP
+    - GDPPOT: Potential GDP
+    - NYGDPMKTPCDWLD: World GDP Per Capita
+  </Tab>
+
+  <Tab title="Inflation">
+    ```json
+    {
+      "search_text": "consumer price",
+      "tag_names": "usa,monthly,inflation",
+      "order_by": "popularity"
+    }
+    ```
+
+    **Key Series:**
+    - CPIAUCSL: CPI All Items
+    - CPILFESL: Core CPI
+    - PCEPI: PCE Price Index
+    - DFEDTARU: Fed Target Rate
+  </Tab>
+
+  <Tab title="Employment">
+    ```json
+    {
+      "search_text": "employment",
+      "tag_names": "usa,monthly,sa",
+      "exclude_tag_names": "discontinued"
+    }
+    ```
+
+    **Key Series:**
+    - PAYEMS: Nonfarm Payrolls
+    - UNRATE: Unemployment Rate
+    - CIVPART: Labor Force Participation
+    - EMRATIO: Employment-Population Ratio
+  </Tab>
+
+  <Tab title="Housing">
+    ```json
+    {
+      "search_text": "housing",
+      "tag_names": "usa,monthly",
+      "filter_variable": "seasonal_adjustment",
+      "filter_value": "sa"
+    }
+    ```
+
+    **Key Series:**
+    - HOUST: Housing Starts
+    - PERMIT: Building Permits
+    - CSUSHPISA: Case-Shiller Index
+    - MORTGAGE30US: 30-Year Mortgage Rate
+  </Tab>
+</Tabs>
+
+### Regional Data Search
+
+```json
+// State-level unemployment
+{
+  "search_text": "unemployment rate",
+  "tag_names": "state,monthly",
+  "limit": 50
+}
+
+// Metropolitan area GDP
+{
+  "search_text": "gdp",
+  "tag_names": "msa,annual",
+  "order_by": "title"
+}
+
+// County-level income
+{
+  "search_text": "personal income",
+  "tag_names": "county,annual"
+}
+```
+
+### International Data Search
+
+```json
+// Global inflation rates
+{
+  "search_text": "inflation",
+  "tag_names": "international,monthly",
+  "exclude_tag_names": "usa"
+}
+
+// Exchange rates
+{
+  "search_text": "exchange rate",
+  "tag_names": "daily,currency"
+}
+
+// International GDP comparison
+{
+  "search_text": "gdp growth",
+  "tag_names": "international,annual,oecd"
+}
+```
+
+## Common Tag Combinations
+
+### By Geography
+
+| Scope | Tags | Example Series |
+|-------|------|----------------|
+| National | `usa` | UNRATE, GDP, CPIAUCSL |
+| State | `state` | CAUNRATE, CASTPRHHRSA |
+| Metro | `msa` | ATXURN, DALPRHHRSA |
+| County | `county` | PCPI01001, CAUNTY01001 |
+| International | `international` | LRHUTTTTJPM156S |
+
+### By Frequency
+
+| Frequency | Tag | Common Uses |
+|-----------|-----|-------------|
+| Daily | `daily` | Interest rates, exchange rates |
+| Weekly | `weekly` | Initial jobless claims |
+| Monthly | `monthly` | CPI, employment, retail sales |
+| Quarterly | `quarterly` | GDP, corporate profits |
+| Annual | `annual` | Population, long-term trends |
+
+### By Topic
+
+| Topic | Common Tags | Key Series |
+|-------|-------------|------------|
+| Monetary Policy | `fed, interest rate, monetary` | DFF, DFEDTARU |
+| Inflation | `inflation, cpi, price` | CPIAUCSL, PCEPI |
+| Labor Market | `employment, labor, unemployment` | UNRATE, PAYEMS |
+| Financial Markets | `stock, bond, yield` | SP500, DGS10 |
+| Housing | `housing, real estate, mortgage` | HOUST, MORTGAGE30US |
+
+## Advanced Search Patterns
+
+### Complex Queries
+
+```json
+// Find all seasonally adjusted monthly employment data for California
+{
+  "search_text": "employment",
+  "tag_names": "california,monthly,sa",
+  "filter_variable": "units",
+  "filter_value": "lin",
+  "order_by": "popularity"
+}
+
+// Get high-frequency financial indicators
+{
+  "search_text": "financial",
+  "tag_names": "daily",
+  "exclude_tag_names": "discontinued,forecast",
+  "order_by": "last_updated",
+  "limit": 20
+}
+
+// Find recession indicators
+{
+  "search_text": "recession",
+  "tag_names": "usa,monthly",
+  "order_by": "popularity",
+  "limit": 10
+}
+```
+
+### Pagination for Large Results
+
+```json
+// First page
+{
+  "search_text": "interest rate",
+  "limit": 100,
+  "offset": 0
+}
+
+// Second page
+{
+  "search_text": "interest rate",
+  "limit": 100,
+  "offset": 100
+}
+
+// Third page
+{
+  "search_text": "interest rate",
+  "limit": 100,
+  "offset": 200
+}
+```
+
+## Error Handling
+
+### Common Errors
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `No results found` | Search too specific | Broaden search terms or remove filters |
+| `Invalid tag_names` | Malformed tag list | Use comma-separated values without spaces |
+| `Invalid filter_value` | Wrong value for filter_variable | Check valid values for the filter type |
+| `Limit exceeds maximum` | limit > 1000 | Use limit ≤ 1000 and pagination |
+
+## Best Practices
+
+<Steps>
+  <Step title="Start Broad">
+    Begin with general terms and progressively add filters
+  </Step>
+
+  <Step title="Use Tags Effectively">
+    Combine geographic, frequency, and topic tags for precision
+  </Step>
+
+  <Step title="Sort by Popularity">
+    Popular series are often the most reliable and widely used
+  </Step>
+
+  <Step title="Exclude Discontinued">
+    Add `exclude_tag_names: "discontinued"` for active series only
+  </Step>
+
+  <Step title="Check Metadata">
+    Review frequency, units, and seasonal adjustment before using data
+  </Step>
+</Steps>
+
+## Related Tools
+
+<CardGroup cols={2}>
+  <Card
+    title="fred_browse"
+    icon="folder-tree"
+    href="/api-reference/fred-browse"
+  >
+    Browse categories systematically
+  </Card>
+  <Card
+    title="fred_get_series"
+    icon="chart-line"
+    href="/api-reference/fred-get-series"
+  >
+    Retrieve data for found series
+  </Card>
+</CardGroup>

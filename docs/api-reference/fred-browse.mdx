@@ -1,0 +1,492 @@
+---
+title: fred_browse
+description: Navigate FRED's complete catalog through categories, releases, and sources
+icon: 'folder-tree'
+---
+
+# fred_browse
+
+Browse and navigate through FRED's hierarchical catalog structure to discover available economic data series.
+
+## Overview
+
+The `fred_browse` tool provides systematic navigation through FRED's extensive catalog of over 800,000 economic time series. Use it to:
+
+- Explore economic categories and subcategories
+- Browse data releases from various sources
+- List all series within a specific category or release
+- Discover data sources and their available series
+
+## Parameters
+
+<ParamField path="browse_type" type="string" required>
+  Type of browsing operation to perform.
+
+  **Options:**
+  - `categories`: Browse category tree
+  - `releases`: List data releases
+  - `sources`: List data sources
+  - `category_series`: Get all series in a category
+  - `release_series`: Get all series in a release
+</ParamField>
+
+<ParamField path="category_id" type="number">
+  Category ID for browsing subcategories or series.
+
+  **Required when:**
+  - `browse_type` is `category_series`
+
+  **Optional when:**
+  - `browse_type` is `categories` (omit to get root categories)
+
+  **Common IDs:**
+  - `32991`: Money, Banking & Finance
+  - `10`: Population, Employment & Labor Markets
+  - `1`: Production & Business Activity
+  - `32992`: Prices
+  - `3008`: U.S. Regional Data
+  - `32264`: International Data
+</ParamField>
+
+<ParamField path="release_id" type="number">
+  Release ID for browsing series within a release.
+
+  **Required when:**
+  - `browse_type` is `release_series`
+
+  **Popular Release IDs:**
+  - `53`: GDP
+  - `50`: Employment Situation
+  - `10`: Consumer Price Index
+  - `15`: Industrial Production and Capacity Utilization
+  - `18`: Federal Reserve Economic Data
+</ParamField>
+
+<ParamField path="limit" type="number" default="50">
+  Maximum number of results to return (1-1000).
+</ParamField>
+
+<ParamField path="offset" type="number" default="0">
+  Number of results to skip for pagination.
+</ParamField>
+
+<ParamField path="order_by" type="string">
+  Field to order results by.
+
+  **Options vary by browse_type:**
+  - Categories: `name`, `series_count`
+  - Series: `series_id`, `title`, `popularity`, `last_updated`
+  - Releases: `name`, `release_id`, `press_release`
+</ParamField>
+
+<ParamField path="sort_order" type="string" default="asc">
+  Sort order for results.
+
+  **Options:**
+  - `asc`: Ascending order
+  - `desc`: Descending order
+</ParamField>
+
+## Examples
+
+### Browse Root Categories
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_browse",
+  "params": {
+    "browse_type": "categories"
+  }
+}
+```
+
+```json Response
+{
+  "categories": [
+    {
+      "id": 32991,
+      "name": "Money, Banking, & Finance",
+      "parent_id": 0,
+      "series_count": 48000
+    },
+    {
+      "id": 10,
+      "name": "Population, Employment, & Labor Markets",
+      "parent_id": 0,
+      "series_count": 84000
+    },
+    {
+      "id": 1,
+      "name": "Production & Business Activity",
+      "parent_id": 0,
+      "series_count": 52000
+    }
+  ],
+  "metadata": {
+    "count": 8,
+    "total": 8
+  }
+}
+```
+</CodeGroup>
+
+### Browse Subcategories
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_browse",
+  "params": {
+    "browse_type": "categories",
+    "category_id": 32991
+  }
+}
+```
+
+```json Response
+{
+  "categories": [
+    {
+      "id": 22,
+      "name": "Interest Rates",
+      "parent_id": 32991,
+      "series_count": 12000
+    },
+    {
+      "id": 24,
+      "name": "Exchange Rates",
+      "parent_id": 32991,
+      "series_count": 3500
+    },
+    {
+      "id": 46,
+      "name": "Banking",
+      "parent_id": 32991,
+      "series_count": 8000
+    }
+  ]
+}
+```
+</CodeGroup>
+
+### Get Series in a Category
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_browse",
+  "params": {
+    "browse_type": "category_series",
+    "category_id": 22,
+    "limit": 5,
+    "order_by": "popularity",
+    "sort_order": "desc"
+  }
+}
+```
+
+```json Response
+{
+  "series": [
+    {
+      "id": "DGS10",
+      "title": "Market Yield on U.S. Treasury Securities at 10-Year Constant Maturity",
+      "observation_start": "1962-01-02",
+      "observation_end": "2024-12-31",
+      "frequency": "Daily",
+      "units": "Percent",
+      "seasonal_adjustment": "Not Seasonally Adjusted",
+      "popularity": 95
+    },
+    {
+      "id": "DFF",
+      "title": "Federal Funds Effective Rate",
+      "observation_start": "1954-07-01",
+      "observation_end": "2024-12-31",
+      "frequency": "Daily",
+      "units": "Percent",
+      "seasonal_adjustment": "Not Seasonally Adjusted",
+      "popularity": 93
+    }
+  ],
+  "metadata": {
+    "count": 5,
+    "offset": 0,
+    "limit": 5,
+    "total": 12000
+  }
+}
+```
+</CodeGroup>
+
+### Browse Data Releases
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_browse",
+  "params": {
+    "browse_type": "releases",
+    "limit": 10,
+    "order_by": "name"
+  }
+}
+```
+
+```json Response
+{
+  "releases": [
+    {
+      "id": 10,
+      "name": "Consumer Price Index",
+      "press_release": true,
+      "link": "https://www.bls.gov/news.release/cpi.nr0.htm",
+      "source": "U.S. Bureau of Labor Statistics"
+    },
+    {
+      "id": 50,
+      "name": "Employment Situation",
+      "press_release": true,
+      "link": "https://www.bls.gov/news.release/empsit.nr0.htm",
+      "source": "U.S. Bureau of Labor Statistics"
+    },
+    {
+      "id": 53,
+      "name": "Gross Domestic Product",
+      "press_release": true,
+      "link": "https://www.bea.gov/news/current-releases",
+      "source": "U.S. Bureau of Economic Analysis"
+    }
+  ],
+  "metadata": {
+    "count": 10,
+    "total": 300
+  }
+}
+```
+</CodeGroup>
+
+### Browse Data Sources
+
+<CodeGroup>
+```json Request
+{
+  "tool": "fred_browse",
+  "params": {
+    "browse_type": "sources",
+    "limit": 5
+  }
+}
+```
+
+```json Response
+{
+  "sources": [
+    {
+      "id": 1,
+      "name": "Board of Governors of the Federal Reserve System (US)",
+      "link": "https://www.federalreserve.gov/",
+      "series_count": 45000
+    },
+    {
+      "id": 2,
+      "name": "U.S. Bureau of Labor Statistics",
+      "link": "https://www.bls.gov/",
+      "series_count": 75000
+    },
+    {
+      "id": 3,
+      "name": "U.S. Bureau of Economic Analysis",
+      "link": "https://www.bea.gov/",
+      "series_count": 35000
+    }
+  ],
+  "metadata": {
+    "count": 5,
+    "total": 89
+  }
+}
+```
+</CodeGroup>
+
+## Navigation Strategies
+
+### Hierarchical Exploration
+
+<Steps>
+  <Step title="Start with Root Categories">
+    ```json
+    {
+      "browse_type": "categories"
+    }
+    ```
+  </Step>
+
+  <Step title="Drill Down to Subcategories">
+    ```json
+    {
+      "browse_type": "categories",
+      "category_id": 32991
+    }
+    ```
+  </Step>
+
+  <Step title="List Series in Category">
+    ```json
+    {
+      "browse_type": "category_series",
+      "category_id": 22,
+      "order_by": "popularity"
+    }
+    ```
+  </Step>
+
+  <Step title="Retrieve Specific Series">
+    Use `fred_get_series` with the discovered series ID
+  </Step>
+</Steps>
+
+### Release-Based Discovery
+
+<Steps>
+  <Step title="List All Releases">
+    ```json
+    {
+      "browse_type": "releases",
+      "order_by": "name"
+    }
+    ```
+  </Step>
+
+  <Step title="Get Series in Release">
+    ```json
+    {
+      "browse_type": "release_series",
+      "release_id": 10
+    }
+    ```
+  </Step>
+
+  <Step title="Filter and Retrieve">
+    Use series IDs with `fred_get_series`
+  </Step>
+</Steps>
+
+## Common Use Cases
+
+### Finding Interest Rate Data
+
+```json
+// Step 1: Navigate to Money & Banking
+{
+  "browse_type": "categories",
+  "category_id": 32991
+}
+
+// Step 2: Find Interest Rates category (ID: 22)
+{
+  "browse_type": "category_series",
+  "category_id": 22,
+  "order_by": "popularity",
+  "limit": 20
+}
+```
+
+### Exploring Regional Data
+
+```json
+// Step 1: Go to U.S. Regional Data
+{
+  "browse_type": "categories",
+  "category_id": 3008
+}
+
+// Step 2: Browse states
+{
+  "browse_type": "categories",
+  "category_id": 27281  // States category
+}
+
+// Step 3: Get California data
+{
+  "browse_type": "category_series",
+  "category_id": 27286  // California
+}
+```
+
+### Finding Latest Economic Releases
+
+```json
+// Get recent releases
+{
+  "browse_type": "releases",
+  "order_by": "release_id",
+  "sort_order": "desc",
+  "limit": 10
+}
+```
+
+## Category Reference
+
+### Top-Level Categories
+
+| ID | Name | Description | Series Count |
+|----|------|-------------|--------------|
+| 32991 | Money, Banking & Finance | Financial markets, interest rates, exchange rates | ~48,000 |
+| 10 | Population, Employment & Labor Markets | Jobs, unemployment, demographics | ~84,000 |
+| 1 | Production & Business Activity | GDP, industrial production, business indicators | ~52,000 |
+| 32992 | Prices | Inflation, CPI, PPI, commodity prices | ~32,000 |
+| 3008 | U.S. Regional Data | State and metro area statistics | ~350,000 |
+| 32264 | International Data | Global economic indicators | ~150,000 |
+| 32263 | Academic Data | Research datasets from universities | ~15,000 |
+
+### Popular Subcategories
+
+| Parent | ID | Name | Key Series |
+|--------|-----|------|------------|
+| 32991 | 22 | Interest Rates | DFF, DGS10, DGS2, TB3MS |
+| 32991 | 24 | Exchange Rates | DEXUSEU, DEXJPUS, DEXCHUS |
+| 10 | 12 | Unemployment Rate | UNRATE, U6RATE, CIVPART |
+| 1 | 18 | GDP | GDP, GDPC1, GDPPOT |
+| 32992 | 9 | Consumer Price Indexes | CPIAUCSL, CPILFESL |
+
+## Error Handling
+
+### Common Errors
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `Invalid browse_type` | Unknown browse_type value | Use one of: categories, releases, sources, category_series, release_series |
+| `category_id required` | Missing required parameter | Provide category_id when browse_type is category_series |
+| `release_id required` | Missing required parameter | Provide release_id when browse_type is release_series |
+| `Invalid category_id` | Category doesn't exist | Verify category_id or browse to find correct ID |
+
+### Best Practices
+
+<Info>
+  **Tips for Efficient Browsing:**
+  - Start broad and narrow down systematically
+  - Use popularity ordering to find commonly-used series
+  - Plan navigation path to minimize API calls
+  - Combine with `fred_search` for targeted discovery
+</Info>
+
+## Related Tools
+
+<CardGroup cols={2}>
+  <Card
+    title="fred_search"
+    icon="magnifying-glass"
+    href="/api-reference/fred-search"
+  >
+    Search for specific series by keywords
+  </Card>
+  <Card
+    title="fred_get_series"
+    icon="chart-line"
+    href="/api-reference/fred-get-series"
+  >
+    Retrieve data for discovered series
+  </Card>
+</CardGroup>
