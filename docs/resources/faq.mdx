@@ -1,0 +1,189 @@
+---
+title: FAQ
+description: Frequently asked questions about FRED MCP Server
+icon: 'circle-question'
+---
+
+# Frequently Asked Questions
+
+## General Questions
+
+<AccordionGroup>
+  <Accordion title="What is FRED?">
+    FRED (Federal Reserve Economic Data) is a database of over 800,000 economic time series maintained by the Federal Reserve Bank of St. Louis. It provides free access to economic data from U.S. and international sources.
+  </Accordion>
+
+  <Accordion title="What is MCP?">
+    Model Context Protocol (MCP) is an open standard that enables AI assistants to connect to external data sources and tools. The FRED MCP Server implements this protocol to provide AI assistants with access to FRED's economic data.
+  </Accordion>
+
+  <Accordion title="Is FRED data free?">
+    Yes! FRED data is completely free for research, education, and personal use. You just need to register for a free API key. Commercial use may require permission.
+  </Accordion>
+
+  <Accordion title="Do I need programming experience?">
+    No! When using the MCP server with AI assistants like Claude, you can request economic data using natural language. The AI assistant handles the technical details.
+  </Accordion>
+</AccordionGroup>
+
+## API and Access
+
+<AccordionGroup>
+  <Accordion title="How do I get an API key?">
+    1. Visit [FRED API Registration](https://fredaccount.stlouisfed.org/apikeys)
+    2. Create a free account
+    3. Request an API key (instant approval)
+    4. Add key to your configuration
+
+    See the [Authentication guide](/core-concepts/authentication) for details.
+  </Accordion>
+
+  <Accordion title="What are the rate limits?">
+    - 120 requests per minute (general)
+    - 40 requests per minute (series observations)
+    - Daily limits vary by account
+
+    The MCP server handles rate limiting automatically with retries.
+  </Accordion>
+
+  <Accordion title="Can I use this commercially?">
+    The FRED MCP Server is open source (AGPL-3.0). For commercial use of FRED data, review [FRED's terms](https://fred.stlouisfed.org/docs/api/terms_of_use.html) or contact the FRED team.
+  </Accordion>
+</AccordionGroup>
+
+## Data Questions
+
+<AccordionGroup>
+  <Accordion title="How current is the data?">
+    FRED data is updated as soon as source agencies release it. Update frequencies vary:
+    - Daily: Interest rates, stock prices
+    - Weekly: Jobless claims
+    - Monthly: Employment, inflation
+    - Quarterly: GDP
+  </Accordion>
+
+  <Accordion title="How far back does data go?">
+    It varies by series. Some series date back to the 1800s, while others are more recent. Check each series' `observation_start` field.
+  </Accordion>
+
+  <Accordion title="What does 'seasonally adjusted' mean?">
+    Seasonally adjusted (SA) data has regular seasonal patterns removed, making it easier to identify underlying trends. Use SA data for comparing across different months or analyzing trends.
+  </Accordion>
+
+  <Accordion title="Why are there multiple inflation measures?">
+    Different measures serve different purposes:
+    - **CPI**: Consumer prices, used for cost-of-living adjustments
+    - **PCE**: Personal consumption expenditure, Fed's preferred measure
+    - **PPI**: Producer prices, early indicator of consumer inflation
+    - **Core**: Excludes volatile food and energy prices
+  </Accordion>
+</AccordionGroup>
+
+## Technical Questions
+
+<AccordionGroup>
+  <Accordion title="Which AI assistants are supported?">
+    Any MCP-compatible AI assistant, including:
+    - Claude Desktop
+    - Other MCP-enabled clients
+
+    See the [Installation guide](/installation) for setup instructions.
+  </Accordion>
+
+  <Accordion title="Can I use this without an AI assistant?">
+    The MCP server is designed for AI assistants, but you can access FRED data directly through:
+    - FRED website
+    - FRED API
+    - FRED add-ins for Excel, R, Python
+  </Accordion>
+
+  <Accordion title="How do I update the server?">
+    ```bash
+    npm update -g fred-mcp-server
+    ```
+    Then restart your MCP client.
+  </Accordion>
+
+  <Accordion title="Where are logs stored?">
+    Logs depend on your MCP client. For Claude Desktop:
+    - macOS: `~/Library/Logs/Claude/`
+    - Windows: `%APPDATA%\Claude\logs\`
+  </Accordion>
+</AccordionGroup>
+
+## Common Issues
+
+<AccordionGroup>
+  <Accordion title="Why am I getting authentication errors?">
+    Common causes:
+    - API key not set in environment
+    - Typo in API key
+    - API key revoked
+    - Server not restarted after config change
+
+    See [Troubleshooting](/resources/troubleshooting) for solutions.
+  </Accordion>
+
+  <Accordion title="Why is my series search returning no results?">
+    Try:
+    - Broader search terms
+    - Checking series ID spelling
+    - Using `fred_browse` instead
+    - Removing restrictive tags
+  </Accordion>
+
+  <Accordion title="Why is data missing for certain dates?">
+    Possible reasons:
+    - Weekends/holidays (daily data)
+    - Series discontinued
+    - Data not yet released
+    - Gaps in source data
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Which series should I use?">
+    Popular starting points:
+    - **UNRATE**: Unemployment rate
+    - **CPIAUCSL**: Inflation (CPI)
+    - **GDP**: Economic output
+    - **DFF**: Fed funds rate
+    - **SP500**: Stock market
+
+    See [Common Series](/resources/common-series) for more.
+  </Accordion>
+
+  <Accordion title="How should I cite FRED data?">
+    Include:
+    - Series source (e.g., "U.S. Bureau of Labor Statistics")
+    - "retrieved from FRED, Federal Reserve Bank of St. Louis"
+    - Series URL
+    - Access date
+  </Accordion>
+
+  <Accordion title="Should I use SA or NSA data?">
+    - **SA (Seasonally Adjusted)**: For trend analysis and comparisons across months
+    - **NSA (Not Seasonally Adjusted)**: For understanding actual seasonal patterns
+    
+    Most analysis uses SA data.
+  </Accordion>
+</AccordionGroup>
+
+## Still Need Help?
+
+<CardGroup cols={2}>
+  <Card title="Troubleshooting" icon="wrench" href="/resources/troubleshooting">
+    Solve common problems
+  </Card>
+  <Card title="GitHub Issues" icon="github" href="https://github.com/stefanoamorelli/fred-mcp-server/issues">
+    Report bugs or request features
+  </Card>
+  <Card title="FRED Support" icon="circle-info" href="https://fred.stlouisfed.org/contactus">
+    Contact FRED team
+  </Card>
+  <Card title="Documentation" icon="book" href="/introduction">
+    Browse full documentation
+  </Card>
+</CardGroup>

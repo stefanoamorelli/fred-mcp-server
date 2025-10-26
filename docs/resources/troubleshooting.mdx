@@ -1,0 +1,137 @@
+---
+title: Troubleshooting
+description: Solutions to common issues with FRED MCP Server
+icon: 'wrench'
+---
+
+# Troubleshooting Guide
+
+Solutions to common problems when using the FRED MCP Server.
+
+## Authentication Issues
+
+### API Key Not Found
+
+**Symptoms:** "Bad Request. The value for variable api_key is not registered."
+
+**Solutions:**
+
+<Steps>
+  <Step title="Verify API Key">
+    Check that your API key is exactly 32 characters
+  </Step>
+  <Step title="Check Environment Variable">
+    Ensure `FRED_API_KEY` is set correctly
+  </Step>
+  <Step title="Restart Server">
+    Restart the MCP server after config changes
+  </Step>
+  <Step title="Test Key">
+    Try the key directly in a browser:
+    ```
+    https://api.stlouisfed.org/fred/series?series_id=GDP&api_key=YOUR_KEY
+    ```
+  </Step>
+</Steps>
+
+## Rate Limiting
+
+### Too Many Requests (429)
+
+**Symptoms:** "Too many requests" error
+
+**Solutions:**
+
+- Wait 60 seconds before retrying
+- Reduce request frequency
+- Use date ranges to limit data
+- Plan queries to avoid redundant requests
+
+## Data Issues
+
+### Series Not Found (404)
+
+**Symptoms:** "Bad Request. The series does not exist."
+
+**Solutions:**
+
+- Verify series ID spelling
+- Check if series has been discontinued
+- Search for alternative series
+- Use `fred_search` to find correct ID
+
+### Empty Results
+
+**Symptoms:** No data returned
+
+**Solutions:**
+
+- Check date range is valid
+- Verify series has data for requested period
+- Try broader date range
+- Check if series is vintage/discontinued
+
+## Connection Issues
+
+### Server Won't Start
+
+**Symptoms:** MCP server fails to launch
+
+**Solutions:**
+
+<AccordionGroup>
+  <Accordion title="Check Node.js">
+    Ensure Node.js v16+ is installed:
+    ```bash
+    node --version
+    ```
+  </Accordion>
+
+  <Accordion title="Reinstall Package">
+    ```bash
+    npm uninstall -g fred-mcp-server
+    npm install -g fred-mcp-server
+    ```
+  </Accordion>
+
+  <Accordion title="Check Permissions">
+    Ensure execute permissions:
+    ```bash
+    chmod +x $(which fred-mcp-server)
+    ```
+  </Accordion>
+
+  <Accordion title="Review Logs">
+    Check error messages in console output
+  </Accordion>
+</AccordionGroup>
+
+## Performance Issues
+
+### Slow Requests
+
+**Symptoms:** Requests take too long
+
+**Solutions:**
+
+- Limit date ranges
+- Reduce result limits
+- Use specific series IDs
+- Plan queries to minimize API calls
+
+## Getting Help
+
+<CardGroup cols={2}>
+  <Card title="GitHub Issues" icon="github" href="https://github.com/stefanoamorelli/fred-mcp-server/issues">
+    Report bugs and request features
+  </Card>
+  <Card title="FRED API Docs" icon="book" href="https://fred.stlouisfed.org/docs/api/">
+    Official FRED API documentation
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/resources/faq">
+    Frequently asked questions
+  </Card>
+  <Card title="Configuration" icon="gear" href="/configuration">
+    Setup guide
+  </Card>
+</CardGroup>
