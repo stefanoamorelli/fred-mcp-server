@@ -1,0 +1,71 @@
+---
+title: Security
+description: Security policy and vulnerability reporting
+icon: 'shield'
+---
+
+# Security Policy
+
+## Supported Versions
+
+| Version | Supported |
+|---------|-----------|
+| 1.x.x | ✅ Yes |
+| < 1.0 | ❌ No |
+
+## Reporting a Vulnerability
+
+If you discover a security vulnerability, please email stefano@amorelli.tech instead of using the public issue tracker.
+
+Include:
+
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Suggested fix (if any)
+
+## Response Timeline
+
+- **Acknowledgment**: Within 48 hours
+- **Initial Assessment**: Within 1 week
+- **Fix Timeline**: Varies by severity
+- **Public Disclosure**: After fix is released
+
+## Security Best Practices
+
+<AccordionGroup>
+  <Accordion title="API Key Protection">
+    - Never commit API keys to version control
+    - Use environment variables
+    - Rotate keys periodically
+    - Use separate keys for dev/prod
+  </Accordion>
+
+  <Accordion title="Dependency Security">
+    - Keep dependencies updated
+    - Review security advisories
+    - Use `npm audit` regularly
+  </Accordion>
+
+  <Accordion title="Safe Usage">
+    - Validate all user inputs
+    - Don't expose keys in logs
+    - Use HTTPS for API calls
+    - Implement rate limiting
+  </Accordion>
+</AccordionGroup>
+
+## Known Issues
+
+Check [GitHub Security Advisories](https://github.com/stefanoamorelli/fred-mcp-server/security/advisories) for current issues.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/core-concepts/authentication">
+    API key setup
+  </Card>
+  <Card title="Contributing" icon="code-pull-request" href="/community/contributing">
+    Contribute securely
+  </Card>
+</CardGroup>
