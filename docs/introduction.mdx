@@ -1,0 +1,224 @@
+---
+title: Introduction
+description: Welcome to the Federal Reserve Economic Data MCP Server documentation
+icon: 'home'
+---
+
+<img
+  className="block dark:hidden"
+  src="/images/fred-hero-light.svg"
+  alt="FRED MCP Server Hero Light"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/fred-hero-dark.svg"
+  alt="FRED MCP Server Hero Dark"
+/>
+
+# Federal Reserve Economic Data MCP Server
+
+<Note>
+  **Disclaimer**: This open-source project is not affiliated with, sponsored by, or endorsed by the Federal Reserve or the Federal Reserve Bank of St. Louis. "FRED" is a registered trademark of the Federal Reserve Bank of St. Louis, used here for descriptive purposes only.
+</Note>
+
+<Warning>
+  **Important**: By using this software, you agree to comply with the [FRED® API Terms of Use](https://fred.stlouisfed.org/docs/api/terms_of_use.html). Users are solely responsible for ensuring their use of FRED data complies with all applicable terms and conditions. The developers of this software are not responsible for any misuse or violations of FRED's terms of service.
+</Warning>
+
+A powerful Model Context Protocol (MCP) server that provides universal access to all **800,000+ Federal Reserve Economic Data (FRED®)** time series through three comprehensive tools. Built for AI assistants, researchers, and developers who need reliable economic data.
+
+## What is FRED MCP Server?
+
+The FRED MCP Server bridges the gap between AI assistants and the vast repository of economic data maintained by the Federal Reserve Bank of St. Louis. It enables:
+
+<CardGroup cols={2}>
+  <Card
+    title="Comprehensive Data Access"
+    icon="database"
+    href="/core-concepts/fred-data"
+  >
+    Access over 800,000 economic time series from 100+ sources
+  </Card>
+  <Card
+    title="AI-Native Integration"
+    icon="robot"
+    href="/core-concepts/mcp-protocol"
+  >
+    Seamlessly integrate with Claude, ChatGPT, and other AI assistants
+  </Card>
+  <Card
+    title="Advanced Analytics"
+    icon="chart-line"
+    href="/api-reference/fred-get-series"
+  >
+    Built-in data transformations and frequency adjustments
+  </Card>
+  <Card
+    title="Real-Time Updates"
+    icon="clock"
+    href="/examples/economic-indicators"
+  >
+    Get the latest economic indicators as they're released
+  </Card>
+</CardGroup>
+
+## Why Use FRED MCP Server?
+
+### For Researchers and Analysts
+
+- **Instant Access**: Query any economic indicator without manual downloads
+- **Historical Data**: Access decades of historical economic data
+- **Automated Workflows**: Build reproducible research pipelines
+- **Data Transformations**: Apply percentage changes, growth rates, and more
+
+### For AI Application Developers
+
+- **MCP Standard**: Built on the open Model Context Protocol standard
+- **Type-Safe**: Full TypeScript support with comprehensive type definitions
+- **Error Handling**: Robust error handling and validation
+- **Rate Limiting**: Built-in rate limiting to respect API constraints
+
+### For Financial Professionals
+
+- **Market Indicators**: Track GDP, unemployment, inflation, and more
+- **Policy Analysis**: Monitor Federal Reserve policy indicators
+- **International Data**: Access global economic indicators
+- **Custom Aggregations**: Transform data to match your analysis needs
+
+## Key Features
+
+<AccordionGroup>
+  <Accordion title="Browse Economic Categories" icon="folder-tree">
+    Navigate through FRED's hierarchical category structure to discover available data series. Browse by topic, source, or release schedule.
+  </Accordion>
+
+  <Accordion title="Search Capabilities" icon="magnifying-glass">
+    Search across all 800,000+ series using keywords, tags, or specific filters. Find exactly the data you need quickly.
+  </Accordion>
+
+  <Accordion title="Data Retrieval & Transformation" icon="arrow-right-arrow-left">
+    Retrieve any series with built-in transformations including growth rates, percentage changes, logarithmic scaling, and frequency conversions.
+  </Accordion>
+
+  <Accordion title="Real-Time Updates" icon="arrows-rotate">
+    Access the latest economic data as soon as it's released by the Federal Reserve and other authoritative sources.
+  </Accordion>
+</AccordionGroup>
+
+## Quick Example
+
+Here's how easy it is to get started with FRED MCP Server:
+
+<CodeGroup>
+```typescript Claude Desktop
+// Ask Claude:
+"What's the current US unemployment rate?"
+
+// Claude uses fred_get_series tool:
+{
+  "tool": "fred_get_series",
+  "params": {
+    "series_id": "UNRATE",
+    "limit": 12
+  }
+}
+```
+
+```python Research Script
+# Use with any MCP client
+client.call_tool(
+    "fred_search",
+    {
+        "search_text": "inflation",
+        "tag_names": "usa,monthly",
+        "limit": 5
+    }
+)
+```
+
+```javascript Analysis
+// Get GDP growth rate
+const gdpGrowth = await mcp.callTool(
+  "fred_get_series",
+  {
+    series_id: "GDP",
+    units: "pc1", // Percent change from year ago
+    frequency: "q"  // Quarterly
+  }
+);
+```
+</CodeGroup>
+
+## Academic Citation
+
+If you use this project in your research, please cite it:
+
+<Tabs>
+  <Tab title="APA">
+    ```text
+    Amorelli, S. (2025). Federal Reserve Economic Data MCP (Model Context
+    Protocol) Server (Version 1.0.2) [Computer software]. Zenodo.
+    https://doi.org/10.5281/zenodo.14536707
+    ```
+  </Tab>
+
+  <Tab title="BibTeX">
+    ```bibtex
+    @software{amorelli_2025_14536707,
+      author       = {Amorelli, Stefano},
+      title        = {{Federal Reserve Economic Data MCP (Model Context
+                       Protocol) Server}},
+      month        = jan,
+      year         = 2025,
+      publisher    = {Zenodo},
+      version      = {1.0.2},
+      doi          = {10.5281/zenodo.14536707},
+      url          = {https://doi.org/10.5281/zenodo.14536707}
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Quick Start"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Get up and running in under 5 minutes
+  </Card>
+  <Card
+    title="Installation Guide"
+    icon="download"
+    href="/installation"
+  >
+    Detailed installation instructions for all platforms
+  </Card>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/overview"
+  >
+    Complete reference for all available tools
+  </Card>
+  <Card
+    title="Examples"
+    icon="flask"
+    href="/examples/basic-usage"
+  >
+    Learn by example with real-world use cases
+  </Card>
+</CardGroup>
+
+## Community & Support
+
+- **GitHub**: [stefanoamorelli/fred-mcp-server](https://github.com/stefanoamorelli/fred-mcp-server)
+- **NPM Package**: [fred-mcp-server](https://www.npmjs.com/package/fred-mcp-server)
+- **Author**: [Stefano Amorelli](https://amorelli.tech)
+- **License**: AGPL-3.0
+
+<Info>
+  Join our community on [GitHub Discussions](https://github.com/stefanoamorelli/fred-mcp-server/discussions) to share ideas, ask questions, and connect with other users.
+</Info>
