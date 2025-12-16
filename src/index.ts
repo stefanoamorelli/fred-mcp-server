@@ -5,6 +5,7 @@ import { registerFREDTools } from "./fred/tools.js";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { startHttpServer } from "./http-server.js";
 
 /**
  * Create and configure a new FRED MCP server
@@ -18,7 +19,7 @@ export function createServer() {
 
   /**
    * Main FRED MCP Server
-   * 
+   *
    * Provides access to Federal Reserve Economic Data through the
    * Model Context Protocol
    */
@@ -35,7 +36,7 @@ export function createServer() {
 }
 
 /**
- * Connect and start the MCP server
+ * Connect and start the MCP server with stdio transport
  */
 export async function startServer(server: McpServer, transport: StdioServerTransport) {
   console.error("FRED MCP Server starting...");
@@ -49,7 +50,7 @@ export async function startServer(server: McpServer, transport: StdioServerTrans
       console.error("Server shutting down...");
       process.exit(0);
     });
-    
+
     return true;
   } catch (error) {
     console.error("Failed to start server:", error);
@@ -57,16 +58,55 @@ export async function startServer(server: McpServer, transport: StdioServerTrans
   }
 }
 
-/**
- * Main entry point
- */
+const TRANSPORT_STDIO = 'stdio' as const;
+const TRANSPORT_STREAMABLE_HTTP = 'streamable-http' as const;
+
+const CLI_FLAG_STREAMABLE_HTTP = '--streamable-http';
+const CLI_FLAG_PORT = '--port=';
+const CLI_FLAG_HOST = '--host=';
+
+const ENV_TRANSPORT = 'FRED_MCP_TRANSPORT';
+const ENV_PORT = 'PORT';
+const ENV_HOST = 'HOST';
+
+const DEFAULT_PORT = 3000;
+const DEFAULT_HOST = '0.0.0.0';
+
+type TransportType = typeof TRANSPORT_STDIO | typeof TRANSPORT_STREAMABLE_HTTP;
+
+interface ServerConfig {
+  transport: TransportType;
+  port?: number;
+  host?: string;
+}
+
+function parseConfig(): ServerConfig {
+  const args = process.argv.slice(2);
+
+  const getArgValue = (prefix: string) =>
+    args.find(arg => arg.startsWith(prefix))?.split('=')[1];
+
+  const useStreamableHttp =
+    args.includes(CLI_FLAG_STREAMABLE_HTTP) ||
+    process.env[ENV_TRANSPORT] === TRANSPORT_STREAMABLE_HTTP;
+
+  return {
+    transport: useStreamableHttp ? TRANSPORT_STREAMABLE_HTTP : TRANSPORT_STDIO,
+    port: getArgValue(CLI_FLAG_PORT) ? parseInt(getArgValue(CLI_FLAG_PORT)!, 10) : undefined,
+    host: getArgValue(CLI_FLAG_HOST)
+  };
+}
+
 async function main() {
-  const server = createServer();
-  const transport = new StdioServerTransport();
-  
-  const success = await startServer(server, transport);
-  if (!success) {
-    process.exit(1);
+  const config = parseConfig();
+
+  if (config.transport === TRANSPORT_STREAMABLE_HTTP) {
+    await startHttpServer({ port: config.port, host: config.host });
+  } else {
+    const server = createServer();
+    const transport = new StdioServerTransport();
+    const success = await startServer(server, transport);
+    if (!success) process.exit(1);
   }
 }
 
