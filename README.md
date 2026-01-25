@@ -110,6 +110,39 @@ You can also run the FRED MCP Server using Docker. Add this configuration to you
 
 Replace `<your-key-here>` with your actual FRED API key.
 
+### Using Streamable HTTP Transport
+
+For network deployments, you can run the server with Streamable HTTP transport instead of stdio:
+
+```bash
+# Using CLI flag
+node build/index.js --http
+
+# Or using environment variable
+TRANSPORT=http node build/index.js
+
+# Custom port (default is 3000)
+PORT=8080 node build/index.js --http
+```
+
+The server will be available at `http://localhost:3000/mcp` (or your custom port).
+
+**Example client request:**
+```bash
+# Initialize session
+curl -X POST http://localhost:3000/mcp \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"my-client","version":"1.0.0"}}}'
+
+# Use the mcp-session-id from the response header for subsequent requests
+curl -X POST http://localhost:3000/mcp \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "mcp-session-id: <session-id-from-init>" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+```
+
 ## Available Tools
 
 This MCP server provides three comprehensive tools to access all 800,000+ FRED® economic data series:
