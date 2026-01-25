@@ -1,6 +1,6 @@
 {
   "name": "fred-mcp-server",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Federal Reserve Economic Data (FRED) MCP Server - Access all 800,000+ economic time series with search, browse, and data retrieval capabilities",
   "main": "build/index.js",
   "keywords": [
@@ -27,6 +27,7 @@
     "test:detect": "node --experimental-vm-modules --no-warnings ./node_modules/jest/bin/jest.js --detectOpenHandles",
     "test:registry": "node --experimental-vm-modules --no-warnings ./node_modules/jest/bin/jest.js test/unit/fred/registry.test.ts",
     "test:client": "node --experimental-vm-modules --no-warnings ./node_modules/jest/bin/jest.js test/unit/fred/client.test.ts",
+    "test:conformance": "node test/conformance/run-conformance.mjs",
     "lint": "tsc --noEmit"
   },
   "files": [
