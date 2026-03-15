@@ -19,20 +19,22 @@ export default {
     "**/__tests__/**/*.+(ts|tsx|js)",
     "**/?(*.)+(spec|test).+(ts|tsx|js)"
   ],
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/.claude/'],
   collectCoverage: true,
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',
     '!**/node_modules/**'
   ],
+  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/.claude/'],
   forceExit: true,
 
   coverageThreshold: {
     global: {
-      branches: 10,
-      functions: 30,
-      lines: 30,
-      statements: 25
+      branches: 20,
+      functions: 40,
+      lines: 35,
+      statements: 30
     }
   }
 };
