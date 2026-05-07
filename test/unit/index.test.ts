@@ -1,9 +1,8 @@
 import { describe, expect, test, jest, beforeEach, afterEach } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
-import { createServer, startServer } from '../../src/index.js';
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { pathToFileURL } from 'url';
+import { isMainModule } from '../../src/index.js';
 
 // Create mock class instead of using jest.mock
 // This avoids ESM module mocking issues
@@ -52,5 +51,14 @@ describe('Server entry point', () => {
 
     // Check for FRED tools registration
     expect(content).toContain('registerFREDTools(server)');
+  });
+
+  test('isMainModule compares file paths instead of file URLs', () => {
+    const argvPath = path.resolve('build/index.js');
+    const moduleUrl = pathToFileURL(argvPath).href;
+
+    expect(isMainModule(moduleUrl, argvPath)).toBe(true);
+    expect(isMainModule(moduleUrl, path.resolve('build/other.js'))).toBe(false);
+    expect(isMainModule(moduleUrl, undefined)).toBe(false);
   });
 });
