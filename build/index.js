@@ -6,7 +6,7 @@ import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { registerFREDTools } from "./fred/tools.js";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { dirname, join, resolve } from "path";
 import { randomUUID } from "crypto";
 import express from "express";
 /**
@@ -175,7 +175,10 @@ async function main() {
     }
 }
 export const TESTING_DISABLED_AUTO_START = false;
-if (import.meta.url === `file://${process.argv[1]}` && !TESTING_DISABLED_AUTO_START) {
+export function isMainModule(moduleUrl, argvPath = process.argv[1]) {
+    return argvPath ? fileURLToPath(moduleUrl) === resolve(argvPath) : false;
+}
+if (isMainModule(import.meta.url) && !TESTING_DISABLED_AUTO_START) {
     main().catch((error) => {
         console.error("Fatal error in main():", error);
         process.exit(1);

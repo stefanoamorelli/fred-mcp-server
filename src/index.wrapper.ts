@@ -82,7 +82,7 @@ async function main() {
 }
 
 // Only run the main function if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (fredServer.isMainModule(import.meta.url)) {
   main().catch((error) => {
     console.error("Fatal error in main():", error);
     process.exit(1);
