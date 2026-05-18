@@ -25,21 +25,24 @@ describe('FRED tools module', () => {
       expect(typeof registerFREDTools).toBe('function');
     });
     
-    test('registers all three tools with the server', () => {
+    test('registers all six tools with the server', () => {
       const mockServer = createMockServer();
       registerFREDTools(mockServer as any);
-      
-      // Verify server.tool was called three times
-      expect(mockServer.tool).toHaveBeenCalledTimes(3);
-      
+
+      // Verify server.tool was called six times
+      expect(mockServer.tool).toHaveBeenCalledTimes(6);
+
       // Get the registered tools
       const toolCalls = mockServer.tool.mock.calls;
       const toolNames = toolCalls.map(call => call[0]);
-      
-      // Verify all three tools are registered
+
+      // Verify all six tools are registered
       expect(toolNames).toContain('fred_browse');
       expect(toolNames).toContain('fred_search');
       expect(toolNames).toContain('fred_get_series');
+      expect(toolNames).toContain('fred_release_dates');
+      expect(toolNames).toContain('fred_series_info');
+      expect(toolNames).toContain('fred_series_tags');
     });
     
     test('fred_browse tool has correct schema', () => {
@@ -96,6 +99,43 @@ describe('FRED tools module', () => {
       expect(schema).toHaveProperty('frequency');
     });
     
+    test('fred_release_dates tool has correct schema', () => {
+      const mockServer = createMockServer();
+      registerFREDTools(mockServer as any);
+
+      const toolCall = mockServer.tool.mock.calls.find(call => call[0] === 'fred_release_dates');
+      expect(toolCall).toBeDefined();
+
+      const schema = toolCall![2];
+      expect(schema).toHaveProperty('release_id');
+      expect(schema).toHaveProperty('limit');
+      expect(schema).toHaveProperty('offset');
+      expect(schema).toHaveProperty('sort_order');
+      expect(schema).toHaveProperty('include_release_dates_with_no_data');
+    });
+
+    test('fred_series_info tool has correct schema', () => {
+      const mockServer = createMockServer();
+      registerFREDTools(mockServer as any);
+
+      const toolCall = mockServer.tool.mock.calls.find(call => call[0] === 'fred_series_info');
+      expect(toolCall).toBeDefined();
+
+      const schema = toolCall![2];
+      expect(schema).toHaveProperty('series_id');
+    });
+
+    test('fred_series_tags tool has correct schema', () => {
+      const mockServer = createMockServer();
+      registerFREDTools(mockServer as any);
+
+      const toolCall = mockServer.tool.mock.calls.find(call => call[0] === 'fred_series_tags');
+      expect(toolCall).toBeDefined();
+
+      const schema = toolCall![2];
+      expect(schema).toHaveProperty('series_id');
+    });
+
     test('all tool handlers are functions', () => {
       const mockServer = createMockServer();
       registerFREDTools(mockServer as any);
