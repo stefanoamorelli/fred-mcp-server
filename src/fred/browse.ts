@@ -230,6 +230,177 @@ export async function getReleaseSeries(releaseId: number, options: {
 }
 
 /**
+ * Get release dates for a specific release (upcoming and historical)
+ */
+export async function getReleaseDates(releaseId: number, options: {
+  limit?: number;
+  offset?: number;
+  sort_order?: "asc" | "desc";
+  include_release_dates_with_no_data?: boolean;
+} = {}) {
+  try {
+    const queryParams: Record<string, string | number | boolean> = {
+      release_id: releaseId
+    };
+
+    if (options.limit !== undefined) queryParams.limit = options.limit;
+    if (options.offset !== undefined) queryParams.offset = options.offset;
+    if (options.sort_order) queryParams.sort_order = options.sort_order;
+    if (options.include_release_dates_with_no_data !== undefined) {
+      queryParams.include_release_dates_with_no_data = options.include_release_dates_with_no_data;
+    }
+
+    const response = await makeRequest<{
+      count: number;
+      offset: number;
+      limit: number;
+      release_dates: Array<{ release_id: number; date: string }>;
+    }>("release/dates", queryParams);
+
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify({
+          release_id: releaseId,
+          total_dates: response.count,
+          showing: `${response.offset + 1}-${Math.min(response.offset + response.limit, response.count)}`,
+          release_dates: response.release_dates.map(d => d.date)
+        }, null, 2)
+      }]
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to get release dates: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Get all upcoming release dates across all releases
+ */
+export async function getAllReleaseDates(options: {
+  limit?: number;
+  offset?: number;
+  sort_order?: "asc" | "desc";
+  include_release_dates_with_no_data?: boolean;
+} = {}) {
+  try {
+    const queryParams: Record<string, string | number | boolean> = {};
+
+    if (options.limit !== undefined) queryParams.limit = options.limit;
+    if (options.offset !== undefined) queryParams.offset = options.offset;
+    if (options.sort_order) queryParams.sort_order = options.sort_order;
+    if (options.include_release_dates_with_no_data !== undefined) {
+      queryParams.include_release_dates_with_no_data = options.include_release_dates_with_no_data;
+    }
+
+    const response = await makeRequest<{
+      count: number;
+      offset: number;
+      limit: number;
+      release_dates: Array<{ release_id: number; release_name: string; date: string }>;
+    }>("releases/dates", queryParams);
+
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify({
+          total_dates: response.count,
+          showing: `${response.offset + 1}-${Math.min(response.offset + response.limit, response.count)}`,
+          release_dates: response.release_dates.map(d => ({
+            release_id: d.release_id,
+            release_name: d.release_name,
+            date: d.date
+          }))
+        }, null, 2)
+      }]
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to get all release dates: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Get detailed info about a specific series
+ */
+export async function getSeriesInfo(seriesId: string) {
+  try {
+    const response = await makeRequest<{
+      seriess: Array<{
+        id: string;
+        realtime_start: string;
+        realtime_end: string;
+        title: string;
+        observation_start: string;
+        observation_end: string;
+        frequency: string;
+        frequency_short: string;
+        units: string;
+        units_short: string;
+        seasonal_adjustment: string;
+        seasonal_adjustment_short: string;
+        last_updated: string;
+        popularity: number;
+        notes: string;
+      }>;
+    }>("series", { series_id: seriesId });
+
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify(response.seriess[0] || {}, null, 2)
+      }]
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to get series info: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Get tags for a series
+ */
+export async function getSeriesTags(seriesId: string) {
+  try {
+    const response = await makeRequest<{
+      tags: Array<{
+        name: string;
+        group_id: string;
+        notes: string;
+        created: string;
+        popularity: number;
+        series_count: number;
+      }>;
+    }>("series/tags", { series_id: seriesId });
+
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify({
+          series_id: seriesId,
+          tags: response.tags.map(t => ({
+            name: t.name,
+            group: t.group_id,
+            popularity: t.popularity
+          }))
+        }, null, 2)
+      }]
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to get series tags: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+/**
  * Browse all FRED sources
  */
 export async function browseSources(options: {

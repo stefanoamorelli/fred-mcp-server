@@ -7,7 +7,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { searchSeries, FREDSearchOptions } from "./search.js";
 import { getSeriesData, FREDSeriesOptions } from "./series.js";
-import { browseCategories, getCategorySeries, browseReleases, getReleaseSeries, browseSources } from "./browse.js";
+import { browseCategories, getCategorySeries, browseReleases, getReleaseSeries, browseSources, getReleaseDates, getAllReleaseDates, getSeriesInfo, getSeriesTags } from "./browse.js";
 
 /**
  * Schema for FRED search tool
@@ -142,6 +142,63 @@ export function registerFREDTools(server: McpServer) {
       const result = await getSeriesData(input as FREDSeriesOptions);
       console.error("fred_get_series complete");
       return result;
+    }
+  );
+
+  // Register release dates tool
+  server.tool(
+    "fred_release_dates",
+    "Get release dates for a specific FRED release (e.g., CPI, Employment Situation, GDP). Use release_id to get dates for a specific release, or omit it to get all upcoming release dates across all releases. Useful for finding when economic data will be published.",
+    {
+      release_id: z.number().optional().describe("Release ID to get dates for. Omit to get all upcoming release dates."),
+      limit: z.number().min(1).max(1000).optional().default(50).describe("Maximum number of dates to return"),
+      offset: z.number().min(0).optional().default(0).describe("Number of results to skip"),
+      sort_order: z.enum(["asc", "desc"]).optional().default("desc").describe("Sort order by date"),
+      include_release_dates_with_no_data: z.boolean().optional().describe("Include dates with no data (future scheduled releases)")
+    },
+    async (input: any) => {
+      console.error(`fred_release_dates called with params: ${JSON.stringify(input)}`);
+      if (input.release_id) {
+        return await getReleaseDates(input.release_id, {
+          limit: input.limit,
+          offset: input.offset,
+          sort_order: input.sort_order,
+          include_release_dates_with_no_data: input.include_release_dates_with_no_data
+        });
+      } else {
+        return await getAllReleaseDates({
+          limit: input.limit,
+          offset: input.offset,
+          sort_order: input.sort_order,
+          include_release_dates_with_no_data: input.include_release_dates_with_no_data
+        });
+      }
+    }
+  );
+
+  // Register series info tool
+  server.tool(
+    "fred_series_info",
+    "Get detailed metadata about a specific FRED series including title, units, frequency, seasonal adjustment, observation range, popularity, and notes.",
+    {
+      series_id: z.string().describe("The FRED series ID (e.g., 'GDP', 'UNRATE', 'CPIAUCSL')")
+    },
+    async (input: any) => {
+      console.error(`fred_series_info called with params: ${JSON.stringify(input)}`);
+      return await getSeriesInfo(input.series_id);
+    }
+  );
+
+  // Register series tags tool
+  server.tool(
+    "fred_series_tags",
+    "Get tags associated with a FRED series. Useful for understanding what categories and classifications a series belongs to.",
+    {
+      series_id: z.string().describe("The FRED series ID (e.g., 'GDP', 'UNRATE')")
+    },
+    async (input: any) => {
+      console.error(`fred_series_tags called with params: ${JSON.stringify(input)}`);
+      return await getSeriesTags(input.series_id);
     }
   );
 }
