@@ -1,6 +1,5 @@
 # Federal Reserve Economic Data MCP Server
 
-[![smithery badge](https://smithery.ai/badge/@stefanoamorelli/fred-mcp-server)](https://smithery.ai/server/@stefanoamorelli/fred-mcp-server)
 [![npm version](https://img.shields.io/npm/v/fred-mcp-server.svg)](https://www.npmjs.com/package/fred-mcp-server)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14536707.svg)](https://doi.org/10.5281/zenodo.14536707)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -39,14 +38,6 @@ Amorelli, S. (2025). Federal Reserve Economic Data MCP (Model Context Protocol) 
 
 
 ## Installation
-
-### Installing via Smithery
-
-To install Federal Reserve Economic Data Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@stefanoamorelli/fred-mcp-server):
-
-```bash
-npx -y @smithery/cli install @stefanoamorelli/fred-mcp-server --client claude
-```
 
 ### Manual Installation
 
