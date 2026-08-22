@@ -1,5 +1,6 @@
 import { describe, expect, test, jest, beforeEach, afterEach } from '@jest/globals';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { isMainModule } from '../../src/index.js';
@@ -60,5 +61,24 @@ describe('Server entry point', () => {
     expect(isMainModule(moduleUrl, argvPath)).toBe(true);
     expect(isMainModule(moduleUrl, path.resolve('build/other.js'))).toBe(false);
     expect(isMainModule(moduleUrl, undefined)).toBe(false);
+  });
+
+  const symlinkTest = process.platform === 'win32' ? test.skip : test;
+
+  symlinkTest('isMainModule resolves the npm bin symlink to its target', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fred-mcp-bin-'));
+    const target = path.join(dir, 'index.js');
+    const shim = path.join(dir, 'fred-mcp-server');
+
+    try {
+      fs.writeFileSync(target, '');
+      fs.symlinkSync(target, shim);
+
+      // argv[1] is the shim, import.meta.url is the resolved target: this is
+      // what `npx fred-mcp-server` gives us.
+      expect(isMainModule(pathToFileURL(target).href, shim)).toBe(true);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

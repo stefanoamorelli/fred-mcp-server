@@ -8,7 +8,7 @@ import { getHttpConfig } from "./common/config.js";
 import { logger } from "./common/logger.js";
 import { getRequestStats } from "./common/request.js";
 import { SessionManager } from "./http/session-manager.js";
-import { readFileSync } from "fs";
+import { readFileSync, realpathSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join, resolve } from "path";
 import { randomUUID } from "crypto";
@@ -253,8 +253,23 @@ async function main() {
 
 export const TESTING_DISABLED_AUTO_START = false;
 
+/**
+ * Resolve symlinks so a path can be compared to another. npm installs the bin
+ * entry as a symlink (node_modules/.bin/fred-mcp-server), and Node reports the
+ * real path in import.meta.url while process.argv[1] keeps the symlink, so the
+ * two only match once both sides are resolved. Falls back to the original path
+ * when it does not exist on disk.
+ */
+function toRealPath(path: string): string {
+  try {
+    return realpathSync(path);
+  } catch {
+    return path;
+  }
+}
+
 export function isMainModule(moduleUrl: string, argvPath = process.argv[1]): boolean {
-  return argvPath ? fileURLToPath(moduleUrl) === resolve(argvPath) : false;
+  return argvPath ? toRealPath(fileURLToPath(moduleUrl)) === toRealPath(resolve(argvPath)) : false;
 }
 
 if (isMainModule(import.meta.url) && !TESTING_DISABLED_AUTO_START) {
